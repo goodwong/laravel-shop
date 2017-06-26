@@ -1,0 +1,20 @@
+{
+    "name": "goodwong/laravel-shop",
+    "description": "Laravel 订单模块，提供基本的商品、订单结构",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "william",
+            "email": "goodwong@foxmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+    },
+    "autoload": {
+        "psr-4": {
+            "Goodwong\\LaravelShop\\": "src/"
+        }
+    }
+}
