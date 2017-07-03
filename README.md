@@ -36,7 +36,7 @@
 ```php
 echo app('Goodwong\LaravelShop\Handlers\OrderHandler')
 ->appendItem(['name' => 'xxxx', 'price' => 1500], 1, ['group' => 'cloth'])
-->appendItem(['name' => 'fruit', 'price' => 200], 2, ['group' => 'others'])
+->appendItem(['name' => 'fruit', 'price' => 200, 'unit' => 'L'], 2, ['group' => 'others'])
 ->appendItem(['name' => 'no-juice', 'price'=>1508], null, ['group' => 'others'])
 ->appendItem(['name'=>'apple'], 15, ['group' => 'others'])
 ->setContacts(['name'=>'william', 'telephone'=>'13510614266', 'address'=>'nanshan district, shenzhen city'])
@@ -49,7 +49,7 @@ echo app('Goodwong\LaravelShop\Handlers\OrderHandler')
 // === cloth ===
 // xxxx  x 1  15.00元
 // === others ===
-// fruit  x 2  4.00元
+// fruit  x 2L  4.00元
 // no-juice
 // apple  x 15
 // 

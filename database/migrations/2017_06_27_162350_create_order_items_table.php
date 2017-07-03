@@ -24,6 +24,7 @@ class CreateOrderItemsTable extends Migration
             $table->string('sku', 32)->nullable()->comment('商品统一编码');
             $table->integer('price')->nullable()->comment('原始单价，不含选项、不含折扣、锐、运费等，有可能为负数');
             $table->integer('qty')->nullable()->comment('数量，不计数量为null，如coupon“业主推荐 -500元”');
+            $table->string('unit', 16)->nullable()->comment('计数单位');
             $table->integer('row_total')->nullable()->comment('行小计，如装修里的特殊要求，免费');
             $table->string('comment')->nullable()->comment('用户留言');
             $table->jsonb('data')->nullable()->comment('数据，根据type定义');

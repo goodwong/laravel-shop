@@ -82,6 +82,24 @@ class OrderHandler
     }
 
     /**
+     * append record
+     * 
+     * @param  string  $content
+     * @return this
+     */
+    public function record($content)
+    {
+        $order = $this->getOrder();
+        $records = (array)$order->records;
+        $records[] = [
+            'content' => $content,
+            'timestamp' => date('Y/m/d H:i:s'),
+        ];
+        $order->records = $records;
+        return $this;
+    }
+
+    /**
      * append order item
      * 
      * @param  array  $product { name }
@@ -99,13 +117,14 @@ class OrderHandler
         $sku = data_get($product, 'sku');
         $price = data_get($product, 'price');
         $qty = $quantity;
+        $unit = data_get($product, 'unit');
         $row_total = data_get($attributes, 'row_total', $price !== null && $qty !== null ? $price * $quantity : null);
         $comment = data_get($attributes, 'comment');
         $data = data_get($attributes, 'data');
 
         $item = new OrderItem(compact(
             'type',
-            'shop_id', 'product_id', 'group', 'name', 'sku', 'price',
+            'shop_id', 'product_id', 'group', 'name', 'sku', 'price', 'unit',
             'qty', 'row_total', 'comment', 'data'
         ));
         $this->items[] = $item;
@@ -207,7 +226,8 @@ class OrderHandler
             }
             foreach ($items->values()->all() as $item) {
                 if (data_get($item, 'group') === $group) {
-                    $lines[] = implode("  ", [$item->name, $item->qty ? "x {$item->qty}" : '', $item->row_total ? number_format($item->row_total / 100, 2) . "元" : '']);
+                    $unit = data_get($item, 'unit') ? $item->unit : '';
+                    $lines[] = implode("  ", [$item->name, $item->qty ? "x {$item->qty}{$unit}" : '', $item->row_total ? number_format($item->row_total / 100, 2) . "元" : '']);
                 }
             }
         }

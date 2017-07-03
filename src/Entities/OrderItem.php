@@ -27,6 +27,7 @@ class OrderItem extends Model
         'sku',
         'price',
         'qty',
+        'unit',
         'row_total',
         'comment',
         'data',
