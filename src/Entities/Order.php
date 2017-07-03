@@ -49,5 +49,12 @@ class Order extends Model
         'contacts' => 'object',
         'records' => 'array',
     ];
-    //
+
+    /**
+     * items for order
+     */
+    public function items()
+    {
+        return $this->hasMany('Goodwong\LaravelShop\Entities\OrderItem');
+    }
 }

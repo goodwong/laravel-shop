@@ -56,7 +56,9 @@ class OrderHandler
      */
     public function load($order_id)
     {
-        //
+        $this->order = Order::findOrFail($order_id);
+        $this->order->load('items');
+        $this->items = $this->order->items;
         return $this;
     }
     /**
