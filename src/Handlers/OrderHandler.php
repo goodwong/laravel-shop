@@ -102,7 +102,9 @@ class OrderHandler
     }
 
     /**
-     * append order item
+     * append order item. 
+     * 
+     * 产品选项里的价格需要调用者计算，若没有row_total，则自动计算 product.price * qty
      * 
      * @param  array  $product { name }
      * @param  integer  $quantity
