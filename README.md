@@ -1,12 +1,16 @@
 # Laravel 5 Shop
 
-基本的商家、订单结构
+基本的商家、订单结构（未完成）
 
 > 订单可以独立使用
 
 ## 安装
+```shell
+composer require goodwong/laravel-shop
+```
 
 ## 数据结构
+（待整理）
 
 ## 场景
 
@@ -33,6 +37,50 @@
 - name 需求名称
 
 ## 使用
+实例化
+```php
+$handler = app('Goodwong\LaravelShop\Handlers\OrderHandler');
+// 也可以使用DI方式注入
+public function __construct(Goodwong\LaravelShop\Handlers\OrderHandler $handler) {
+	$this->orderHandler = $handler;
+}
+```
+
+添加项
+> 不会自动合并商品
+> 商品可以是 Product对象实例，也可以只是数组。必填字段是 name（参考数据规范）
+
+```php
+// 简单
+$handler->appendItem($product = ['name' => 'xxxx', 'price' => 1500], $qty = 1);
+// qty 可以省略，默认为1
+$handler->appendItem($product = ['name' => 'xxxx', 'price' => 1500]);
+// 可以分组
+$handler->appendItem(['name' => 'xxxx', 'price' => 1500], 1, ['group' => '配件']);
+// 商品单位
+$handler->appendItem(['name' => 'fruit', 'price' => 200, 'unit' => 'L', 'sku' => 'FRUIT-APPLE-001']);
+// 不要价格
+$handler->appendItem(['name'=>'apple'], 15, ['group' => 'others']);
+```
+
+~~更新项（未完成）~~
+```php
+$handler->updateItem($item, $quantity, $attributes = []);
+```
+
+设置信息
+```php
+// 联系方式
+$handler->setContacts(['name'=>'william', 'telephone'=>'13510614266', 'address'=>'nanshan district, shenzhen city']);
+// 设置用户
+$handler->setUserId(1);
+// 添加备注
+$handler->setComment($comment = 'some comments...');
+// 添加日志
+$handler->record('place holder...');
+```
+
+链式调用
 ```php
 echo app('Goodwong\LaravelShop\Handlers\OrderHandler')
 ->appendItem(['name' => 'xxxx', 'price' => 1500], 1, ['group' => 'cloth'])
@@ -41,21 +89,40 @@ echo app('Goodwong\LaravelShop\Handlers\OrderHandler')
 ->appendItem(['name'=>'apple'], 15, ['group' => 'others'])
 ->setContacts(['name'=>'william', 'telephone'=>'13510614266', 'address'=>'nanshan district, shenzhen city'])
 ->setUserId(1);
-// 【联系信息】
-// william 13510614266
-// nanshan district, shenzhen city
-// 
-// 【产品明细】
-// === cloth ===
-// xxxx  x 1  15.00元
-// === others ===
-// fruit  x 2L  4.00元
-// no-juice
-// apple  x 15
-// 
-// 【费用】
-// 小计19.00元
-// 总计19.00元
+```
+
+持久化
+```php
+$handler->save();
+$handler->load($order_id);
+```
+
+其它
+```php
+$handler->getOrder();
+$handler->getItems();
+$handler->toArray();
+
+// 测试用
+(string)$handler;
+/****************************
+  【联系信息】
+  william 13510614266
+  nanshan district, shenzhen city
+  
+  【产品明细】
+  === cloth ===
+  xxxx  x 1  15.00元
+  === others ===
+  fruit  x 2L  4.00元
+  no-juice
+  apple  x 15
+  
+  【费用】
+  小计19.00元
+  总计19.00元
+****************************/
 ```
 
 ## RESTful接口规范
+（待整理）
