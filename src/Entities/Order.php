@@ -51,10 +51,20 @@ class Order extends Model
     ];
 
     /**
-     * items for order
+     * items belongs to order
      */
     public function items()
     {
         return $this->hasMany('Goodwong\LaravelShop\Entities\OrderItem');
+    }
+
+    /**
+     * payments belongs to order
+     */
+    public function payments()
+    {
+        return $this->hasMany('Goodwong\LaravelShop\Entities\OrderPayment')
+        ->orderBy('id', 'desc')
+        ;
     }
 }
