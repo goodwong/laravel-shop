@@ -10,8 +10,10 @@
 
 namespace Goodwong\LaravelShop\Handlers;
 
+use Illuminate\Http\Request;
 use Goodwong\LaravelShop\Entities\Order;
 use Goodwong\LaravelShop\Entities\OrderItem;
+use Goodwong\LaravelShop\Entities\OrderPayment;
 
 class OrderHandler
 {
@@ -191,6 +193,87 @@ class OrderHandler
     }
 
     /**
+     * charge
+     * 
+     * @param  string  $gateway_code
+     * @param  string  $brief
+     * @return this
+     */
+    public function charge($gateway_code, $brief = null)
+    {
+        $order = $this->getOrder();
+        if (!$order->id) {
+            throw new \Exception('order not saved');
+        }
+        $payment = OrderPayment::create([
+            'order_id' => $order->id,
+            'amount' => $order->grand_total,
+            'gateway' => $gateway_code,
+        ]);
+        try {
+            $gateway = $this->getGateway($gateway_code, $payment->id);
+            $gateway->onCharge($order, $brief);
+
+            $payment->data = $gateway->getTransactionData();
+            $payment->transaction_id = $gateway->getTransactionId();
+            $payment->status = $gateway->getTransactionStatus();
+            if ($payment->status === 'success') {
+                $payment->paid_at = date('Y-m-d H:i:s');
+            }
+        } catch (\Exception $e) {
+            $payment->status = 'failure';
+            $payment->comment = $e->getMessage();
+        }
+        $payment->save();
+        return $this;
+    }
+
+    /**
+     * callback
+     * 
+     * @param  \Illuminate\Http\Request  $request
+     * @param  integer  $payment_id
+     * @return Response
+     */
+    public function callback(Request $request, $payment_id)
+    {
+        $payment = OrderPayment::findOrFail($payment_id);
+        try {
+            $gateway = $this->getGateway($payment->gateway, $payment->id);
+            $response = $gateway->onCallback($request);
+
+            $payment->transaction_id = $gateway->getTransactionId();
+            $payment->status = $gateway->getTransactionStatus();
+            if ($payment->status === 'success') {
+                $payment->paid_at = date('Y-m-d H:i:s');
+            }
+            $payment->save();
+            return $response;
+        } catch (\Exception $e) {
+            $payment->status = 'failure';
+            $payment->comment = $e->getMessage();
+            $payment->save();
+            abort(500, $e->getMessage());
+        }
+    }
+
+    /**
+     * get gateway
+     * 
+     * @param  string  $gateway_code
+     * @param  integer  $payment_id
+     * @return  Gateway
+     */
+    private function getGateway($gateway_code, $payment_id)
+    {
+        $className = config("shop.gateways.{$gateway_code}");
+        if ($className && class_exists($className)) {
+            return new $className($gateway_code, $payment_id);
+        }
+        throw new \Exception('invalid gateway: ' . $gateway);
+    }
+
+    /**
      * to array
      * 
      * @return array
@@ -231,7 +314,11 @@ class OrderHandler
             foreach ($items->values()->all() as $item) {
                 if (data_get($item, 'group') === $group) {
                     $unit = data_get($item, 'unit') ? $item->unit : '';
-                    $lines[] = implode("  ", [$item->name, $item->qty ? "x {$item->qty}{$unit}" : '', $item->row_total ? number_format($item->row_total / 100, 2) . "元" : '']);
+                    $lines[] = implode("  ", [
+                        $item->name,
+                        $item->qty ? "x {$item->qty}{$unit}" : '',
+                        $item->row_total ? number_format($item->row_total / 100, 2) . "元" : '',
+                    ]);
                 }
             }
         }

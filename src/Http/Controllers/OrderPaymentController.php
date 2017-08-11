@@ -1,11 +1,13 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace Goodwong\LaravelShop\Http\Controllers;
 
-use Goodwong\LaravelShop\Entities\Order;
+use App\Http\Controllers\Controller;
+use Goodwong\LaravelShop\Entities\OrderPayment;
+use Goodwong\LaravelShop\Handlers\OrderHandler;
 use Illuminate\Http\Request;
 
-class OrderController extends Controller
+class OrderPaymentController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -41,10 +43,10 @@ class OrderController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \Goodwong\LaravelShop\Entities\Order  $order
+     * @param  \App\Goodwong\LaravelShop\Entities\OrderPayment  $orderPayment
      * @return \Illuminate\Http\Response
      */
-    public function show(Order $order)
+    public function show(OrderPayment $orderPayment)
     {
         //
     }
@@ -52,10 +54,10 @@ class OrderController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \Goodwong\LaravelShop\Entities\Order  $order
+     * @param  \App\Goodwong\LaravelShop\Entities\OrderPayment  $orderPayment
      * @return \Illuminate\Http\Response
      */
-    public function edit(Order $order)
+    public function edit(OrderPayment $orderPayment)
     {
         //
     }
@@ -64,10 +66,10 @@ class OrderController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Goodwong\LaravelShop\Entities\Order  $order
+     * @param  \App\Goodwong\LaravelShop\Entities\OrderPayment  $orderPayment
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Order $order)
+    public function update(Request $request, OrderPayment $orderPayment)
     {
         //
     }
@@ -75,11 +77,24 @@ class OrderController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \Goodwong\LaravelShop\Entities\Order  $order
+     * @param  \App\Goodwong\LaravelShop\Entities\OrderPayment  $orderPayment
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Order $order)
+    public function destroy(OrderPayment $orderPayment)
     {
         //
+    }
+
+    /**
+     * callback from gateway
+     * 
+     * @param  \Illuminate\Http\Request  $request
+     * @param  integer  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function callback(Request $request, $id)
+    {
+        $handler = new OrderHandler;
+        return $handler->callback($request, $id);
     }
 }

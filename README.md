@@ -9,6 +9,11 @@
 composer require goodwong/laravel-shop
 ```
 
+2. 创建配置文件：
+```shell
+php artisan vendor:publish --provider="Goodwong\LaravelShop\ShopServiceProvider"
+```
+
 ## 数据结构
 （待整理）
 

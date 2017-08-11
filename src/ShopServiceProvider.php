@@ -14,9 +14,9 @@ class ShopServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
-        // $this->publishes([
-        //     __DIR__.'/config/shop.php' => config_path('shop.php'),
-        // ]);
+        $this->publishes([
+            __DIR__.'/../config/shop.php' => config_path('shop.php'),
+        ]);
     }
 
     /**
@@ -26,8 +26,8 @@ class ShopServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        // $this->mergeConfigFrom(
-        //     __DIR__.'/../config/shop.php', 'shop'
-        // );
+        $this->mergeConfigFrom(
+            __DIR__.'/../config/shop.php', 'shop'
+        );
     }
 }
