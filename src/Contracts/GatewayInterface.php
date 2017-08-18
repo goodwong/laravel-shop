@@ -8,6 +8,15 @@ use Goodwong\LaravelShop\Entities\Order;
 interface GatewayInterface
 {
     /**
+     * constructor
+     * 
+     * @param  string  $gateway_id
+     * @param  integer  $payment_id
+     * @return void
+     */
+    public function __construct($gateway_id, $payment_id);
+
+    /**
      * get payment id
      * @return string
      */
