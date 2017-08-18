@@ -159,7 +159,7 @@ class OrderHandler
     /**
      * save order and it's items
      * 
-     * @return Order
+     * @return this
      */
     public function save()
     {
@@ -171,7 +171,7 @@ class OrderHandler
             $item->order_id = $this->order->id;
             $item->save();
         }
-        return $this->order;
+        return $this;
     }
 
     /**
