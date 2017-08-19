@@ -39,9 +39,10 @@ interface GatewayInterface
      * 
      * @param  \Goodwong\LaravelShop\Entities\Order  $order
      * @param  string  $brief
+     * @param  integer  $amount
      * @return void
      */
-    public function onCharge(Order $order, $brief);
+    public function onCharge(Order $order, $brief, $amount);
 
     /**
      * called on callback

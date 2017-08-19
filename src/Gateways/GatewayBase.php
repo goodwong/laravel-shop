@@ -30,7 +30,7 @@ abstract class GatewayBase implements GatewayInterface
      * transaction_status
      * @var string
      */
-    protected $transaction_status = 'pendding';
+    protected $transaction_status = null;
 
     /**
      * transaction data
@@ -113,9 +113,10 @@ abstract class GatewayBase implements GatewayInterface
      * 
      * @param  \Goodwong\LaravelShop\Entities\Order  $order
      * @param  string  $brief
+     * @param  integer  $amount
      * @return void
      */
-    abstract public function onCharge(Order $order, $brief);
+    abstract public function onCharge(Order $order, $brief, $amount);
 
     /**
      * called on callback

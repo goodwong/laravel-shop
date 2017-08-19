@@ -196,10 +196,11 @@ class OrderHandler
      * charge
      * 
      * @param  string  $gateway_code
-     * @param  string  $brief
+     * @param  string  $brief (optional)
+     * @param  integer  $amount (optional)
      * @return this
      */
-    public function charge($gateway_code, $brief = null)
+    public function charge($gateway_code, $brief = null, $amount = null)
     {
         $order = $this->getOrder();
         if (!$order->id) {
@@ -207,24 +208,34 @@ class OrderHandler
         }
         $payment = OrderPayment::create([
             'order_id' => $order->id,
-            'amount' => $order->grand_total,
+            'amount' => $amount ?: $order->grand_total,
             'gateway' => $gateway_code,
         ]);
         try {
             $gateway = $this->getGateway($gateway_code, $payment->id);
-            $gateway->onCharge($order, $brief);
+            $gateway->onCharge($order, $brief ?: "支付订单#{$order->id}", $payment->amount);
 
-            $payment->data = $gateway->getTransactionData();
-            $payment->transaction_id = $gateway->getTransactionId();
-            $payment->status = $gateway->getTransactionStatus();
+            $data = $gateway->getTransactionData();
+            if ($data) {
+                $payment->data = $data;
+            }
+            $transaction_id = $gateway->getTransactionId();
+            if ($transaction_id) {
+                $payment->transaction_id = $transaction_id;
+            }
+            $transaction_status = $gateway->getTransactionStatus();
+            if ($transaction_status) {
+                $payment->status = $transaction_status;
+            }
             if ($payment->status === 'success') {
                 $payment->paid_at = date('Y-m-d H:i:s');
             }
+            $payment->save();
         } catch (\Exception $e) {
             $payment->status = 'failure';
             $payment->comment = $e->getMessage();
+            $payment->save();
         }
-        $payment->save();
         return $this;
     }
 
@@ -242,17 +253,30 @@ class OrderHandler
             $gateway = $this->getGateway($payment->gateway, $payment->id);
             $response = $gateway->onCallback($request);
 
-            $payment->transaction_id = $gateway->getTransactionId();
-            $payment->status = $gateway->getTransactionStatus();
+
+            $data = $gateway->getTransactionData();
+            if ($data) {
+                $payment->data = $data;
+            }
+            $transaction_id = $gateway->getTransactionId();
+            if ($transaction_id) {
+                $payment->transaction_id = $transaction_id;
+            }
+            $transaction_status = $gateway->getTransactionStatus();
+            if ($transaction_status) {
+                $payment->status = $transaction_status;
+            }
             if ($payment->status === 'success') {
                 $payment->paid_at = date('Y-m-d H:i:s');
             }
             $payment->save();
+
             return $response;
         } catch (\Exception $e) {
             $payment->status = 'failure';
             $payment->comment = $e->getMessage();
             $payment->save();
+
             abort(500, $e->getMessage());
         }
     }
