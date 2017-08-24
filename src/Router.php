@@ -7,14 +7,39 @@ use Illuminate\Support\Facades\Route;
 class Router
 {
     /**
-     * routes
+     * order routes
      * 
      * @return void
      */
-    public static function route()
+    public static function order()
     {
-        // require __DIR__.'/routes.php';
-        Route::namespace('\\Goodwong\\LaravelShop\\Http\\Controllers')
-        ->group(__DIR__.'/routes.php');
+        Route::namespace('Goodwong\LaravelShop\Http\Controllers')->group(function () {
+        	Route::resource('orders', 'OrderController');
+        });
+    }
+
+    /**
+     * order payment routes
+     * 
+     * @return void
+     */
+    public static function payment()
+    {
+        Route::namespace('Goodwong\LaravelShop\Http\Controllers')->group(function () {
+        	Route::resource('order-payments', 'OrderPaymentController');
+        });
+    }
+
+    /**
+     * order payment callback route
+     * 
+     * @return void
+     */
+    public static function paymentCallback()
+    {
+        Route::namespace('Goodwong\LaravelShop\Http\Controllers')->group(function () {
+        	Route::any('order-payments/{payment_id}/callback', 'OrderPaymentController@callback')
+        	->name('order-payments.callback');
+        });
     }
 }
