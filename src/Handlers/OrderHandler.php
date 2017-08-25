@@ -14,6 +14,9 @@ use Illuminate\Http\Request;
 use Goodwong\LaravelShop\Entities\Order;
 use Goodwong\LaravelShop\Entities\OrderItem;
 use Goodwong\LaravelShop\Entities\OrderPayment;
+use Goodwong\LaravelShop\Events\OrderCreated;
+use Goodwong\LaravelShop\Events\OrderPaid;
+use Goodwong\LaravelShop\Contracts\GatewayInterface;
 
 class OrderHandler
 {
@@ -163,14 +166,24 @@ class OrderHandler
      */
     public function save()
     {
+        $new_order = !$this->order->id;
+
+        // save order
         $this->updateOrderAmount();
         $this->order->save();
 
+        // save items
         $items = $this->getItems();
         foreach ($items as $item) {
             $item->order_id = $this->order->id;
             $item->save();
         }
+
+        // dispatch event
+        if ($new_order) {
+            event(new OrderCreated($this->order));
+        }
+
         return $this;
     }
 
@@ -206,6 +219,7 @@ class OrderHandler
         if (!$order->id) {
             throw new \Exception('order not saved');
         }
+        $order->update(['status' => 'paying']);
         $payment = OrderPayment::create([
             'order_id' => $order->id,
             'amount' => $amount ?: $order->grand_total,
@@ -215,28 +229,15 @@ class OrderHandler
             $gateway = $this->getGateway($gateway_code, $payment->id);
             $gateway->onCharge($order, $brief ?: "支付订单#{$order->id}", $payment->amount);
 
-            $data = $gateway->getTransactionData();
-            if ($data) {
-                $payment->data = $data;
-            }
-            $transaction_id = $gateway->getTransactionId();
-            if ($transaction_id) {
-                $payment->transaction_id = $transaction_id;
-            }
-            $transaction_status = $gateway->getTransactionStatus();
-            if ($transaction_status) {
-                $payment->status = $transaction_status;
-            }
-            if ($payment->status === 'success') {
-                $payment->paid_at = date('Y-m-d H:i:s');
-            }
-            $payment->save();
+            $this->updatePaymentFromGateway($gateway, $payment);
+            // update order properties...
+            $this->updateOrderAfterPaid($payment);
+
+            return $this;
         } catch (\Exception $e) {
-            $payment->status = 'failure';
-            $payment->comment = $e->getMessage();
-            $payment->save();
+            $payment->update(['status' => 'failure', 'comment' => substr($e->getMessage(), 0, 255),]);
+            throw $e;
         }
-        return $this;
     }
 
     /**
@@ -253,30 +254,13 @@ class OrderHandler
             $gateway = $this->getGateway($payment->gateway, $payment->id);
             $response = $gateway->onCallback($request);
 
-
-            $data = $gateway->getTransactionData();
-            if ($data) {
-                $payment->data = $data;
-            }
-            $transaction_id = $gateway->getTransactionId();
-            if ($transaction_id) {
-                $payment->transaction_id = $transaction_id;
-            }
-            $transaction_status = $gateway->getTransactionStatus();
-            if ($transaction_status) {
-                $payment->status = $transaction_status;
-            }
-            if ($payment->status === 'success') {
-                $payment->paid_at = date('Y-m-d H:i:s');
-            }
-            $payment->save();
+            $this->updatePaymentFromGateway($gateway, $payment);
+            // update order properties...
+            $this->updateOrderAfterPaid($payment);
 
             return $response;
         } catch (\Exception $e) {
-            $payment->status = 'failure';
-            $payment->comment = $e->getMessage();
-            $payment->save();
-
+            $payment->update(['status' => 'failure', 'comment' => substr($e->getMessage(), 0, 255),]);
             abort(500, $e->getMessage());
         }
     }
@@ -295,6 +279,61 @@ class OrderHandler
             return new $className($gateway_code, $payment_id);
         }
         throw new \Exception('invalid gateway: ' . $gateway);
+    }
+
+    /**
+     * update payment from gateway
+     * 
+     * @param  GatewayInterface  $gateway
+     * @param  OrderPayment  $payment
+     * @return void
+     */
+    private function updatePaymentFromGateway(GatewayInterface $gateway, OrderPayment $payment)
+    {
+        $data = $gateway->getTransactionData();
+        if ($data) {
+            $payment->data = $data;
+        }
+        $transaction_id = $gateway->getTransactionId();
+        if ($transaction_id) {
+            $payment->transaction_id = $transaction_id;
+        }
+        $transaction_status = $gateway->getTransactionStatus();
+        if ($transaction_status) {
+            $payment->status = $transaction_status;
+        }
+        if ($payment->status === 'success') {
+            $payment->paid_at = date('Y-m-d H:i:s');
+        }
+        $payment->save();
+    }
+
+    /**
+     * update order status after paid
+     * 
+     * @param  OrderPayment  $payment
+     * @return void
+     */
+    private function updateOrderAfterPaid(OrderPayment $payment)
+    {
+        if (!$this->order) {
+            throw new \Exception('order_id empty!');
+        }
+        if ($payment->status !== 'success') {
+            return;
+        }
+
+        $order = $this->getOrder();
+        $paid_total = $order->payments->where('status', 'success')->sum('amount');
+        $order->paid_total = $paid_total;
+        if ($order->paid_total >= $order->grand_total && $order->status === 'paying') {
+            $order->status = 'new';
+        }
+        $this->record('支付成功！');
+        $order->save();
+
+        // dispatch event
+        event(new OrderPaid($order, $payment));
     }
 
     /**

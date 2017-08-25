@@ -94,7 +94,8 @@ class OrderPaymentController extends Controller
      */
     public function callback(Request $request, $id)
     {
+        $payment = OrderPayment::findOrFail($id);
         $handler = new OrderHandler;
-        return $handler->callback($request, $id);
+        return $handler->load($payment->order_id)->callback($request, $id);
     }
 }
