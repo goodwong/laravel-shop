@@ -79,10 +79,24 @@ $handler->updateItem($item, $quantity, $attributes = []);
 $handler->setContacts(['name'=>'william', 'telephone'=>'13510614266', 'address'=>'nanshan district, shenzhen city']);
 // 设置用户
 $handler->setUserId(1);
-// 添加备注
+// 设置用户留言
 $handler->setComment($comment = 'some comments...');
+// 设置状态
+$handler->setStatus($status = 'paying');
 // 添加日志
 $handler->record('place holder...');
+```
+
+支付
+```php
+// 默认全额支付，也可以指定支付金额$amount
+$handler->charge($gateway_code, $brief = null, $amount = null);
+```
+
+持久化
+```php
+$handler->save();
+$handler->load($order_id);
 ```
 
 链式调用
@@ -93,13 +107,10 @@ echo app('Goodwong\LaravelShop\Handlers\OrderHandler')
 ->appendItem(['name' => 'no-juice', 'price'=>1508], null, ['group' => 'others'])
 ->appendItem(['name'=>'apple'], 15, ['group' => 'others'])
 ->setContacts(['name'=>'william', 'telephone'=>'13510614266', 'address'=>'nanshan district, shenzhen city'])
-->setUserId(1);
-```
-
-持久化
-```php
-$handler->save();
-$handler->load($order_id);
+->setUserId(1)
+->record('place order ...')
+->save()
+->charge('wxpay_native', 'iPad mini 4');
 ```
 
 其它
@@ -131,3 +142,22 @@ $handler->toArray();
 
 ## RESTful接口规范
 （待整理）
+
+
+## 配置
+
+config/shop.php
+
+- payment_callback_route
+    回调路由
+
+- gateways
+    网关列表
+
+
+## 自定义支付网关
+
+1. 继承 Goodwong\LaravelShopGatewayWxpay\
+
+
+
