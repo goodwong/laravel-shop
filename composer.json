@@ -16,5 +16,12 @@
         "psr-4": {
             "Goodwong\\LaravelShop\\": "src/"
         }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Goodwong\\LaravelShop\\ShopServiceProvider"
+            ]
+        }
     }
 }
