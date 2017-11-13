@@ -17,6 +17,7 @@ class CreateProductsTable extends Migration
             $table->increments('id');
             $table->string('shop_id', 16)->nullable()->comment('商家id，如 15 或service_plan');
             $table->string('category_id', 32)->nullable()->comment('分类，如 shop_3_accessories');
+            $table->string('slug', 32)->nullable()->comment('一定范围内唯一，需配合shop_id/category_id使用');
             $table->string('name', 32)->comment('产品名称');
             $table->string('sku', 32)->nullable()->comment('商品统一编码');
             $table->integer('price')->comment('原始单价，不含选项、不含折扣、锐、运费等，有可能为负数');
