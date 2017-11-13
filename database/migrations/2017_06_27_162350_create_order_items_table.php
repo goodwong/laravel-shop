@@ -13,7 +13,7 @@ class CreateOrderItemsTable extends Migration
      */
     public function up()
     {
-        Schema::create('order_items', function (Blueprint $table) {
+        Schema::create('shop_order_items', function (Blueprint $table) {
             $table->increments('id');
             $table->string('type', 16)->comment('区分业务逻辑');
             $table->integer('order_id')->unsigned()->comment('订单id');
@@ -30,6 +30,11 @@ class CreateOrderItemsTable extends Migration
             $table->jsonb('data')->nullable()->comment('数据，根据type定义');
             $table->timestamps();
             $table->softDeletes();
+
+            $table->foreign('order_id')
+                  ->references('id')->on('shop_orders')
+                  ->onUpdate('cascade')
+                  ->onDelete('cascade');
         });
     }
 
@@ -40,6 +45,10 @@ class CreateOrderItemsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('order_items');
+        Schema::table('shop_order_items', function (Blueprint $table) {
+            $table->dropForeign('shop_order_items_order_id_foreign');
+        });
+
+        Schema::dropIfExists('shop_order_items');
     }
 }

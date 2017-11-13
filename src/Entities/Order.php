@@ -12,7 +12,7 @@ class Order extends Model
     /**
      * table name
      */
-    protected $table = 'orders';
+    protected $table = 'shop_orders';
 
     /**
      * fillable fields

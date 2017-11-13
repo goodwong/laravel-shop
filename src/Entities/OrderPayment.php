@@ -12,7 +12,7 @@ class OrderPayment extends Model
     /**
      * table name
      */
-    protected $table = 'order_payments';
+    protected $table = 'shop_order_payments';
 
     /**
      * fillable fields

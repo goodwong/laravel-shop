@@ -13,7 +13,7 @@ class CreateOrdersTable extends Migration
      */
     public function up()
     {
-        Schema::create('orders', function (Blueprint $table) {
+        Schema::create('shop_orders', function (Blueprint $table) {
             $table->increments('id');
             $table->string('context', 32)->nullable()->comment('如：shop_15、project_15、recharge');
             $table->integer('user_id')->unsigned()->comment('用户id');
@@ -41,6 +41,6 @@ class CreateOrdersTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('orders');
+        Schema::dropIfExists('shop_orders');
     }
 }
