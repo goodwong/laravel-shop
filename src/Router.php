@@ -7,6 +7,18 @@ use Illuminate\Support\Facades\Route;
 class Router
 {
     /**
+     * product routes
+     * 
+     * @return void
+     */
+    public static function product()
+    {
+        Route::namespace('Goodwong\LaravelShop\Http\Controllers')->group(function () {
+        	Route::resource('products', 'ProductController');
+        });
+    }
+
+    /**
      * order routes
      * 
      * @return void
