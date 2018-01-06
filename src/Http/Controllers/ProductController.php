@@ -15,6 +15,8 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
+        $per_page = $request->input('per_page', 15);
+
         $query = Product::orderBy('id', 'desc')->orderBy('position', 'asc');
         if ($shop_id = $request->input('shop')) {
             $query = $query->where('shop_id', $shop_id);
@@ -25,7 +27,7 @@ class ProductController extends Controller
         if ($slugs = $request->input('slugs')) {
             $query = $query->whereIn('slug', explode(',', $slugs));
         }
-        return $query->paginate();
+        return $query->paginate($per_page);
     }
 
     /**

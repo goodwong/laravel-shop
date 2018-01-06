@@ -47,7 +47,7 @@ class Order extends Model
      */
     protected $casts = [
         'contacts' => 'object',
-        'records' => 'array',
+        'records' => 'object',
     ];
 
     /**

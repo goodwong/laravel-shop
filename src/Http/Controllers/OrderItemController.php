@@ -2,10 +2,10 @@
 
 namespace Goodwong\LaravelShop\Http\Controllers;
 
-use Goodwong\LaravelShop\Entities\Order;
+use Goodwong\LaravelShop\Entities\OrderItem;
 use Illuminate\Http\Request;
 
-class OrderController extends Controller
+class OrderItemController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -15,19 +15,17 @@ class OrderController extends Controller
      */
     public function index(Request $request)
     {
-        $per_page = $request->input('per_page', 15);
-
-        $query = Order::getModel();
-        if ($user_id = $request->input('user')) {
-            $query = $query->where('user_id', $user_id);
+        $query = OrderItem::getModel();
+        if ($order_ids = $request->input('orders')) {
+            $query = $query->whereIn('order_id', explode(',', $order_ids));
         }
-        if ($context = $request->input('context')) {
-            $query = $query->where('context', $context);
+        if ($product_id = $request->input('product')) {
+            $query = $query->where('product_id', $product_id);
         }
-        if ($ids = $request->input('ids')) {
-            $query = $query->whereIn('id', explode(',', $ids));
+        if ($sku = $request->input('sku')) {
+            $query = $query->where('sku', $sku);
         }
-        return $query->paginate($per_page);
+        return $query->get();
     }
 
     /**
@@ -48,28 +46,28 @@ class OrderController extends Controller
      */
     public function store(Request $request)
     {
-        $order = Order::create($request->all());
-        return $order;
+        $orderItem = OrderItem::create($request->all());
+        return $orderItem;
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \Goodwong\LaravelShop\Entities\Order  $order
+     * @param  \Goodwong\LaravelShop\Entities\OrderItem  $orderItem
      * @return \Illuminate\Http\Response
      */
-    public function show(Order $order)
+    public function show(OrderItem $orderItem)
     {
-        return $order;
+        return $orderItem;
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \Goodwong\LaravelShop\Entities\Order  $order
+     * @param  \Goodwong\LaravelShop\Entities\OrderItem  $orderItem
      * @return \Illuminate\Http\Response
      */
-    public function edit(Order $order)
+    public function edit(OrderItem $orderItem)
     {
         //
     }
@@ -78,24 +76,24 @@ class OrderController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Goodwong\LaravelShop\Entities\Order  $order
+     * @param  \Goodwong\LaravelShop\Entities\OrderItem  $orderItem
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Order $order)
+    public function update(Request $request, OrderItem $orderItem)
     {
-        $order->update($request->all());
-        return $order;
+        $orderItem->update($request->all());
+        return $orderItem;
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \Goodwong\LaravelShop\Entities\Order  $order
+     * @param  \Goodwong\LaravelShop\Entities\OrderItem  $orderItem
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Order $order)
+    public function destroy(OrderItem $orderItem)
     {
-        $order->delete();
+        $orderItem->delete();
         return response('deleted!', 204);
     }
 }

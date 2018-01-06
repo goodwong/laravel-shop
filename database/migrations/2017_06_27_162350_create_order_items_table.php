@@ -15,7 +15,7 @@ class CreateOrderItemsTable extends Migration
     {
         Schema::create('shop_order_items', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('type', 16)->comment('区分业务逻辑');
+            $table->string('type', 16)->nullable()->comment('区分业务逻辑');
             $table->integer('order_id')->unsigned()->comment('订单id');
             $table->string('shop_id', 16)->nullable()->comment('商家id，如 15 或service_plan');
             $table->string('product_id', 16)->nullable()->comment('产品id，如 2837，或plan_B等');

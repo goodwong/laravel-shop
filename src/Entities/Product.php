@@ -41,7 +41,7 @@ class Product extends Model
      */
     protected $casts = [
         'settings' => 'object',
-        'options' => 'array',
+        'options' => 'object',
     ];
 
     //

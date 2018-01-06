@@ -31,6 +31,18 @@ class Router
     }
 
     /**
+     * order routes
+     * 
+     * @return void
+     */
+    public static function orderItem()
+    {
+        Route::namespace('Goodwong\LaravelShop\Http\Controllers')->group(function () {
+        	Route::resource('order-items', 'OrderItemController');
+        });
+    }
+
+    /**
      * order payment routes
      * 
      * @return void
