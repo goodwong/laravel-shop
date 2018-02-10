@@ -15,6 +15,8 @@ class Router
     {
         Route::namespace('Goodwong\LaravelShop\Http\Controllers')->group(function () {
         	Route::resource('products', 'ProductController');
+        	Route::post('product-images', 'ProductImageController@store');
+        	Route::delete('product-images', 'ProductImageController@destroy');
         });
     }
 
