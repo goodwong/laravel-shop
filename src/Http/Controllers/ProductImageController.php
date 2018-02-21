@@ -31,10 +31,10 @@ class ProductImageController extends Controller
             return 'no image';
         }
         // save path...
-        $path = '';
+        $path = 'products';
         $shop_id = $request->input('shop');
         if ($shop_id) {
-            $path = "shop-{$shop_id}";
+            $path = "{$path}/shop-{$shop_id}";
         }
         $product_id = $request->input('product');
         if ($product_id) {
