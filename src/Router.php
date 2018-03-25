@@ -28,7 +28,8 @@ class Router
     public static function order()
     {
         Route::namespace('Goodwong\LaravelShop\Http\Controllers')->group(function () {
-        	Route::resource('orders', 'OrderController');
+            Route::put('orders/batch-update-status', 'OrderController@batchUpdateStatus');
+            Route::resource('orders', 'OrderController');
         });
     }
 

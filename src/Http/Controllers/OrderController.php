@@ -27,6 +27,9 @@ class OrderController extends Controller
         if ($ids = $request->input('ids')) {
             $query = $query->whereIn('id', explode(',', $ids));
         }
+        if ($status = $request->input('status')) {
+            $query = $query->where('status', $status);
+        }
         return $query->paginate($per_page);
     }
 
@@ -85,6 +88,31 @@ class OrderController extends Controller
     {
         $order->update($request->all());
         return $order;
+    }
+
+    /**
+     * batch update
+     * 
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function batchUpdateStatus(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'status' => 'required',
+            'new_status' => 'required',
+        ]);
+
+        $ids = $request->input('ids');
+        $status = $request->input('status');
+        $query = Order::getModel();
+        $query = $query->whereIn('id', $ids);
+        $query = $query->where('status', $status);
+
+        $new_status = $request->input('new_status');
+        $effected_rows = $query->update(['status' => $new_status]);
+        return response()->json(['effected_rows' => $effected_rows]);
     }
 
     /**

@@ -100,7 +100,7 @@ class OrderHandler
         $records = (array)$order->records;
         $records[] = [
             'content' => $content,
-            'timestamp' => date('Y/m/d H:i:s'),
+            'timestamp' => date('Y-m-d H:i:s'),
         ];
         $order->records = $records;
         return $this;
@@ -116,7 +116,7 @@ class OrderHandler
      * @param  array  $attributes  { type, group, row_total, data, comment, }
      * @return this
      */
-    public function appendItem($product, $quantity = null, $attributes = [])
+    public function appendItem($product, $quantity = 1, $attributes = [])
     {
         $type = data_get($attributes, 'type', 'product');
         $shop_id = data_get($product, 'shop_id');
@@ -139,7 +139,7 @@ class OrderHandler
         $this->items[] = $item;
 
         // update order
-        $this->updateOrderAmount();
+        $this->computeOrderAmount();
         return $this;
     }
 
@@ -156,7 +156,7 @@ class OrderHandler
         // ...
 
         // update order
-        $this->updateOrderAmount();
+        $this->computeOrderAmount();
     }
 
     /**
@@ -169,7 +169,7 @@ class OrderHandler
         $new_order = !$this->order->id;
 
         // save order
-        $this->updateOrderAmount();
+        $this->computeOrderAmount();
         $this->order->save();
 
         // save items
@@ -190,7 +190,7 @@ class OrderHandler
     /**
      * update order amount
      */
-    private function updateOrderAmount()
+    private function computeOrderAmount()
     {
         $order = $this->getOrder();
         $items = $this->getItems();

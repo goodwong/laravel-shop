@@ -53,6 +53,8 @@ $handler = app('Goodwong\LaravelShop\Handlers\OrderHandler');
 public function __construct(Goodwong\LaravelShop\Handlers\OrderHandler $handler) {
 	$this->orderHandler = $handler;
 }
+// 实例化已有订单
+$handler = app('Goodwong\LaravelShop\Handlers\OrderHandler')->load($order_id);
 ```
 
 添加项
@@ -70,6 +72,13 @@ $handler->appendItem(['name' => 'xxxx', 'price' => 1500], 1, ['group' => '配件
 $handler->appendItem(['name' => 'fruit', 'price' => 200, 'unit' => 'L', 'sku' => 'FRUIT-APPLE-001']);
 // 不要价格
 $handler->appendItem(['name'=>'apple'], 15, ['group' => 'others']);
+```
+
+其它用法
+```php
+// 自定义费用
+$handler->appendItem(['name' => '配送费'], null, ['group' => '费用', 'row_total' => 1500, ]);
+$handler->appendItem(['name' => '打包费'], null, ['group' => '费用', 'row_total' => 100, ]);
 ```
 
 ~~更新项（未完成）~~
