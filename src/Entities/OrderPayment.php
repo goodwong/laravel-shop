@@ -1,6 +1,6 @@
 <?php
 
-namespace Goodwong\LaravelShop\Entities;
+namespace Goodwong\Shop\Entities;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;

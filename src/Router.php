@@ -1,6 +1,6 @@
 <?php
 
-namespace Goodwong\LaravelShop;
+namespace Goodwong\Shop;
 
 use Illuminate\Support\Facades\Route;
 
@@ -13,7 +13,7 @@ class Router
      */
     public static function product()
     {
-        Route::namespace('Goodwong\LaravelShop\Http\Controllers')->group(function () {
+        Route::namespace('Goodwong\Shop\Http\Controllers')->group(function () {
         	Route::resource('products', 'ProductController');
         	Route::post('product-images', 'ProductImageController@store');
         	Route::delete('product-images', 'ProductImageController@destroy');
@@ -27,7 +27,7 @@ class Router
      */
     public static function order()
     {
-        Route::namespace('Goodwong\LaravelShop\Http\Controllers')->group(function () {
+        Route::namespace('Goodwong\Shop\Http\Controllers')->group(function () {
             Route::put('orders/batch-update-status', 'OrderController@batchUpdateStatus');
             Route::resource('orders', 'OrderController');
         });
@@ -40,7 +40,7 @@ class Router
      */
     public static function orderItem()
     {
-        Route::namespace('Goodwong\LaravelShop\Http\Controllers')->group(function () {
+        Route::namespace('Goodwong\Shop\Http\Controllers')->group(function () {
         	Route::resource('order-items', 'OrderItemController');
         });
     }
@@ -52,7 +52,7 @@ class Router
      */
     public static function payment()
     {
-        Route::namespace('Goodwong\LaravelShop\Http\Controllers')->group(function () {
+        Route::namespace('Goodwong\Shop\Http\Controllers')->group(function () {
         	Route::resource('order-payments', 'OrderPaymentController');
         });
     }
@@ -64,7 +64,7 @@ class Router
      */
     public static function paymentCallback()
     {
-        Route::namespace('Goodwong\LaravelShop\Http\Controllers')->group(function () {
+        Route::namespace('Goodwong\Shop\Http\Controllers')->group(function () {
         	Route::any('order-payments/{payment_id}/callback', 'OrderPaymentController@callback')
         	->name('order-payments.callback');
         });

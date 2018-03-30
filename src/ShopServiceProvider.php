@@ -1,6 +1,6 @@
 <?php
 
-namespace Goodwong\LaravelShop;
+namespace Goodwong\Shop;
 
 use Illuminate\Support\ServiceProvider;
 

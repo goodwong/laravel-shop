@@ -1,9 +1,9 @@
 <?php
 
-namespace Goodwong\LaravelShop\Events;
+namespace Goodwong\Shop\Events;
 
-use Goodwong\LaravelShop\Entities\Order;
-use Goodwong\LaravelShop\Entities\OrderPayment;
+use Goodwong\Shop\Entities\Order;
+use Goodwong\Shop\Entities\OrderPayment;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Broadcasting\PrivateChannel;

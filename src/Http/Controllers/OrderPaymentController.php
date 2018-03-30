@@ -1,10 +1,10 @@
 <?php
 
-namespace Goodwong\LaravelShop\Http\Controllers;
+namespace Goodwong\Shop\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use Goodwong\LaravelShop\Entities\OrderPayment;
-use Goodwong\LaravelShop\Handlers\OrderHandler;
+use Goodwong\Shop\Entities\OrderPayment;
+use Goodwong\Shop\Handlers\OrderHandler;
 use Illuminate\Http\Request;
 
 class OrderPaymentController extends Controller
@@ -43,7 +43,7 @@ class OrderPaymentController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Goodwong\LaravelShop\Entities\OrderPayment  $orderPayment
+     * @param  \App\Goodwong\Shop\Entities\OrderPayment  $orderPayment
      * @return \Illuminate\Http\Response
      */
     public function show(OrderPayment $orderPayment)
@@ -54,7 +54,7 @@ class OrderPaymentController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Goodwong\LaravelShop\Entities\OrderPayment  $orderPayment
+     * @param  \App\Goodwong\Shop\Entities\OrderPayment  $orderPayment
      * @return \Illuminate\Http\Response
      */
     public function edit(OrderPayment $orderPayment)
@@ -66,7 +66,7 @@ class OrderPaymentController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Goodwong\LaravelShop\Entities\OrderPayment  $orderPayment
+     * @param  \App\Goodwong\Shop\Entities\OrderPayment  $orderPayment
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, OrderPayment $orderPayment)
@@ -77,7 +77,7 @@ class OrderPaymentController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Goodwong\LaravelShop\Entities\OrderPayment  $orderPayment
+     * @param  \App\Goodwong\Shop\Entities\OrderPayment  $orderPayment
      * @return \Illuminate\Http\Response
      */
     public function destroy(OrderPayment $orderPayment)

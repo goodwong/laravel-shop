@@ -1,10 +1,10 @@
 <?php
 
-namespace Goodwong\LaravelShop\Gateways;
+namespace Goodwong\Shop\Gateways;
 
 use Illuminate\Http\Request;
-use Goodwong\LaravelShop\Entities\Order;
-use Goodwong\LaravelShop\Contracts\GatewayInterface;
+use Goodwong\Shop\Entities\Order;
+use Goodwong\Shop\Contracts\GatewayInterface;
 
 abstract class GatewayBase implements GatewayInterface
 {
@@ -111,7 +111,7 @@ abstract class GatewayBase implements GatewayInterface
     /**
      * called on charge
      * 
-     * @param  \Goodwong\LaravelShop\Entities\Order  $order
+     * @param  \Goodwong\Shop\Entities\Order  $order
      * @param  string  $brief
      * @param  integer  $amount
      * @return void
@@ -129,7 +129,7 @@ abstract class GatewayBase implements GatewayInterface
     /**
      * get payment serial number
      * 
-     * @param  \Goodwong\LaravelShop\Entities\Order  $order
+     * @param  \Goodwong\Shop\Entities\Order  $order
      * @return string
      */
     protected function getSerialNumber(Order $order)
@@ -154,7 +154,7 @@ abstract class GatewayBase implements GatewayInterface
      * get redirect url
      * 有些当场回调到商家页面的，使用redirect方法
      * 
-     * @param  \Goodwong\LaravelShop\Entities\Order  $order
+     * @param  \Goodwong\Shop\Entities\Order  $order
      * @return string
      */
     // final protected function getRedirectUrl(Order $order)

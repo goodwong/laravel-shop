@@ -7,8 +7,8 @@ use Tests\TestCase;
 use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Goodwong\LaravelShop\Entities\OrderPayment;
-use Goodwong\LaravelShop\Events\OrderPaid;
+use Goodwong\Shop\Entities\OrderPayment;
+use Goodwong\Shop\Events\OrderPaid;
 
 class PaymentTest extends TestCase
 {

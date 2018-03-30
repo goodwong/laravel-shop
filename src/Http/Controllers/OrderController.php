@@ -1,8 +1,8 @@
 <?php
 
-namespace Goodwong\LaravelShop\Http\Controllers;
+namespace Goodwong\Shop\Http\Controllers;
 
-use Goodwong\LaravelShop\Entities\Order;
+use Goodwong\Shop\Entities\Order;
 use Illuminate\Http\Request;
 
 class OrderController extends Controller
@@ -58,7 +58,7 @@ class OrderController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \Goodwong\LaravelShop\Entities\Order  $order
+     * @param  \Goodwong\Shop\Entities\Order  $order
      * @return \Illuminate\Http\Response
      */
     public function show(Order $order)
@@ -69,7 +69,7 @@ class OrderController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \Goodwong\LaravelShop\Entities\Order  $order
+     * @param  \Goodwong\Shop\Entities\Order  $order
      * @return \Illuminate\Http\Response
      */
     public function edit(Order $order)
@@ -81,7 +81,7 @@ class OrderController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Goodwong\LaravelShop\Entities\Order  $order
+     * @param  \Goodwong\Shop\Entities\Order  $order
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, Order $order)
@@ -118,7 +118,7 @@ class OrderController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \Goodwong\LaravelShop\Entities\Order  $order
+     * @param  \Goodwong\Shop\Entities\Order  $order
      * @return \Illuminate\Http\Response
      */
     public function destroy(Order $order)

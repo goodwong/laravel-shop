@@ -15,7 +15,7 @@ composer require goodwong/laravel-shop
 
 2. 创建配置文件：
 ```shell
-php artisan vendor:publish --provider="Goodwong\LaravelShop\ShopServiceProvider"
+php artisan vendor:publish --provider="Goodwong\Shop\ShopServiceProvider"
 ```
 
 ## 数据结构
@@ -48,13 +48,13 @@ php artisan vendor:publish --provider="Goodwong\LaravelShop\ShopServiceProvider"
 ## 使用
 实例化
 ```php
-$handler = app('Goodwong\LaravelShop\Handlers\OrderHandler');
+$handler = app('Goodwong\Shop\Handlers\OrderHandler');
 // 也可以使用DI方式注入
-public function __construct(Goodwong\LaravelShop\Handlers\OrderHandler $handler) {
+public function __construct(Goodwong\Shop\Handlers\OrderHandler $handler) {
 	$this->orderHandler = $handler;
 }
 // 实例化已有订单
-$handler = app('Goodwong\LaravelShop\Handlers\OrderHandler')->load($order_id);
+$handler = app('Goodwong\Shop\Handlers\OrderHandler')->load($order_id);
 ```
 
 添加项
@@ -114,7 +114,7 @@ $handler->load($order_id);
 
 链式调用
 ```php
-echo app('Goodwong\LaravelShop\Handlers\OrderHandler')
+echo app('Goodwong\Shop\Handlers\OrderHandler')
 ->appendItem(['name' => 'xxxx', 'price' => 1500], 1, ['group' => 'cloth'])
 ->appendItem(['name' => 'fruit', 'price' => 200, 'unit' => 'L'], 2, ['group' => 'others'])
 ->appendItem(['name' => 'no-juice', 'price'=>1508], null, ['group' => 'others'])
@@ -170,7 +170,7 @@ config/shop.php
 
 ## 自定义支付网关
 
-1. 继承 Goodwong\LaravelShopGatewayWxpay\
+1. 继承 Goodwong\ShopGatewayWxpay\
 
 
 

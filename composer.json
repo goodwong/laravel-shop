@@ -14,13 +14,13 @@
     },
     "autoload": {
         "psr-4": {
-            "Goodwong\\LaravelShop\\": "src/"
+            "Goodwong\\Shop\\": "src/"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "Goodwong\\LaravelShop\\ShopServiceProvider"
+                "Goodwong\\Shop\\ShopServiceProvider"
             ]
         }
     }

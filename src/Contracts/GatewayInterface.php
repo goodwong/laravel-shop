@@ -1,9 +1,9 @@
 <?php
 
-namespace Goodwong\LaravelShop\Contracts;
+namespace Goodwong\Shop\Contracts;
 
 use Illuminate\Http\Request;
-use Goodwong\LaravelShop\Entities\Order;
+use Goodwong\Shop\Entities\Order;
 
 interface GatewayInterface
 {
@@ -37,7 +37,7 @@ interface GatewayInterface
     /**
      * called on charge
      * 
-     * @param  \Goodwong\LaravelShop\Entities\Order  $order
+     * @param  \Goodwong\Shop\Entities\Order  $order
      * @param  string  $brief
      * @param  integer  $amount
      * @return void

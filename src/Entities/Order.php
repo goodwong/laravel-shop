@@ -1,6 +1,6 @@
 <?php
 
-namespace Goodwong\LaravelShop\Entities;
+namespace Goodwong\Shop\Entities;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -55,7 +55,7 @@ class Order extends Model
      */
     public function items()
     {
-        return $this->hasMany('Goodwong\LaravelShop\Entities\OrderItem');
+        return $this->hasMany('Goodwong\Shop\Entities\OrderItem');
     }
 
     /**
@@ -63,7 +63,7 @@ class Order extends Model
      */
     public function payments()
     {
-        return $this->hasMany('Goodwong\LaravelShop\Entities\OrderPayment')
+        return $this->hasMany('Goodwong\Shop\Entities\OrderPayment')
         ->orderBy('id', 'desc')
         ;
     }

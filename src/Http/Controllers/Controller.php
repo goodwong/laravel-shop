@@ -1,6 +1,6 @@
 <?php
 
-namespace Goodwong\LaravelShop\Http\Controllers;
+namespace Goodwong\Shop\Http\Controllers;
 
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Routing\Controller as BaseController;

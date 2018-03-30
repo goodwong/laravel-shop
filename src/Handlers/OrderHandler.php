@@ -8,15 +8,15 @@
  * 以上逻辑请业务方自行处理
  */
 
-namespace Goodwong\LaravelShop\Handlers;
+namespace Goodwong\Shop\Handlers;
 
 use Illuminate\Http\Request;
-use Goodwong\LaravelShop\Entities\Order;
-use Goodwong\LaravelShop\Entities\OrderItem;
-use Goodwong\LaravelShop\Entities\OrderPayment;
-use Goodwong\LaravelShop\Events\OrderCreated;
-use Goodwong\LaravelShop\Events\OrderPaid;
-use Goodwong\LaravelShop\Contracts\GatewayInterface;
+use Goodwong\Shop\Entities\Order;
+use Goodwong\Shop\Entities\OrderItem;
+use Goodwong\Shop\Entities\OrderPayment;
+use Goodwong\Shop\Events\OrderCreated;
+use Goodwong\Shop\Events\OrderPaid;
+use Goodwong\Shop\Contracts\GatewayInterface;
 
 class OrderHandler
 {
