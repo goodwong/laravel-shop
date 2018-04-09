@@ -209,7 +209,7 @@ echo $shopping;
 
 ## 创建自定义支付网关
 
-> 1. 实现接口 `Goodwong\Shop\Contracts\GatewayInterface`
+> 1. 实现接口 `Goodwong\Shop\Contracts\GatewayInterface`
 > 2. 建议继承 `Goodwong\Shop\Gateways\GatewayBase`
 > 3. 添加到 `config/shop.php` 的 `gateways`数组
 
