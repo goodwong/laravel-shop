@@ -30,17 +30,8 @@ class OrderController extends Controller
         if ($status = $request->input('status')) {
             $query = $query->where('status', $status);
         }
+        $query = $query->with(['items', 'payments']);
         return $query->paginate($per_page);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
     }
 
     /**
@@ -63,18 +54,7 @@ class OrderController extends Controller
      */
     public function show(Order $order)
     {
-        return $order;
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \Goodwong\Shop\Entities\Order  $order
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Order $order)
-    {
-        //
+        return $order->load(['items', 'payments']);
     }
 
     /**
