@@ -141,7 +141,7 @@ $shopping->load($order_id);
 // 默认全额支付
 $shopping->charge($gateway_code = 'wxpay_native', $brief = '小农家-会员充值');
 // 也可以指定支付金额$amount
-$shopping->charge($gateway_code = 'wxpay_native', $brief = null, $amount = null);
+$shopping->charge($gateway_code = 'wxpay_native', $brief = '小农家-会员充值', $amount = null);
 ```
 
 支持链式调用
