@@ -68,7 +68,7 @@ $shopping
     ->group('饮品')
     // 传入product对象，
     // type/shop/name/sku/price/product_id/row_total 自动设置
-    // 后面还可以覆盖这些属性
+    // 后面还可以覆盖这些属性
     ->product($product)
     ->unit('斤')
     ->rowTotal(15000) // 覆盖 price * qty
@@ -80,7 +80,7 @@ $shopping
 
 // 自定义添加（完整参数)
 $shopping
-    ->type('service')
+    ->type('service')
     ->group('服务')
     ->shop('service')
     ->productId($productId)
@@ -89,7 +89,7 @@ $shopping
     ->price(58000)
     ->unit('次')
     ->rowTotal(96000) // 默认 price * qty，此处打折扣
-    ->specs($specs) // 详细参数
+    ->specs($specs) // 详细参数
     ->comment('特制皮具，需使用专用护理液')
     ->add($qty = 2);
 
@@ -136,7 +136,7 @@ $shopping->load($order_id);
 ```
 
 支付
-> `$gateway_code` 需要在 `config/shop.php` 预先配置
+> `$gateway_code` 需要在 `config/shop.php` 预先配置
 ```php
 // 默认全额支付
 $shopping->charge($gateway_code = 'wxpay_native', $brief = '小农家-会员充值');
@@ -170,8 +170,8 @@ echo $shopping;
 /**********************
   【地址】
   老小王 135****4266
-  江西省 会昌县 马甲镇
-  冰球村 122号
+  江西省 会昌县 马甲镇
+  冰球村 122号
   
   【产品明细】
   --- 水果 ---
@@ -216,5 +216,5 @@ echo $shopping;
 
 
 
-## 更多功能（待实现……）
+## 更多功能（待实现……）
 > 1. 优惠券（限制：限商店、限品类、限单品，类型：折扣券、兑换券）
