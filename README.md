@@ -31,7 +31,8 @@ php artisan vendor:publish --provider="Goodwong\Shop\ShopServiceProvider"
 
 
 ## 使用
-实例化
+
+### 实例化
 ```php
 $shopping = app('Goodwong\Shop\Shopping');
 
@@ -45,11 +46,13 @@ public function __construct(Goodwong\Shop\Shopping $shopping)
 $shopping->load($order_id);
 ```
 
-添加项
+### 添加项
 > 1. 不会自动合并商品
 > 2. 商品可以是 Product对象实例，也可以是自定义商品
 > 3. 必填字段是 name
 > 4. 金额的单位是分
+> 5. 没有指定 `add()` 数量时，不会自动计算 `rowTotal`，可以自行设置
+> 6. 自定义选项影响价格计算时，需要自行计算并设置 `rowTotal`
 
 ```php
 // 简单操作
@@ -101,7 +104,7 @@ $shopping
     ->rowTotal(-15000)
     ->add();
 
-// 例子：优惠抵扣
+// 例子：税费
 $shopping
     ->type('tax')
     ->name('税费 3%')
@@ -110,7 +113,7 @@ $shopping
 
 ```
 
-设置信息
+### 设置信息
 ```php
 // 联系方式（格式自定）
 $shopping->contacts([
@@ -119,32 +122,40 @@ $shopping->contacts([
     'address.region'=> '江西省 会昌县 西江镇',
     'address.detail' => '饼丘村12号',
 ]);
+
 // 用户（可选）
 $shopping->user(1);
+
 // 留言
 $shopping->orderComment($comment = 'some comments...');
+
 // 状态
 $shopping->status($status = 'paying');
+
 // 日志
 $shopping->record('place holder...');
 ```
 
-保存 & 载入
+### 保存 & 载入
 ```php
+// 保存
 $shopping->save();
+
+// 从数据库载入
 $shopping->load($order_id);
 ```
 
-支付
+### 支付
 > `$gateway_code` 需要在 `config/shop.php` 预先配置
 ```php
 // 默认全额支付
 $shopping->charge($gateway_code = 'wxpay_native', $brief = '小农家-会员充值');
+
 // 也可以指定支付金额$amount
 $shopping->charge($gateway_code = 'wxpay_native', $brief = '小农家-会员充值', $amount = null);
 ```
 
-支持链式调用
+### 支持链式调用
 ```php
 app('Goodwong\Shop\Shopping')
     ->product($product)->add(1);
@@ -156,12 +167,14 @@ app('Goodwong\Shop\Shopping')
     ->charge('wxpay_native', 'iPad mini 4');
 ```
 
-其它
+### 其它
 ```php
 // 订单
 $shopping->order();
+
 // 订单明细
 $shopping->items();
+
 // 支付明细
 $shopping->payments();
 
@@ -192,11 +205,12 @@ echo $shopping;
 
 ## 配置
 
-`config/shop.php`
+### 修改配置文件 `config/shop.php`
 
 ```php
 // 回调路由
 'payment_callback_route' => env('SHOP_PAYMENT_CALLBACK_ROUTE', 'order-payments.callback'),
+
 // 网关列表
 'gateways' => [
     'wxpay_native' => \Goodwong\ShopGatewayWxpay\GatewayWxpayNative::class,
@@ -207,7 +221,7 @@ echo $shopping;
 ```
 
 
-## 创建自定义支付网关
+### 创建自定义支付网关
 
 > 1. 实现接口 `Goodwong\Shop\Contracts\GatewayInterface`
 > 2. 建议继承 `Goodwong\Shop\Gateways\GatewayBase`
