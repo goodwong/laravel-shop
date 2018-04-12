@@ -123,7 +123,7 @@ $shopping->contacts([
     'address.detail' => '饼丘村12号',
 ]);
 
-// 用户（可选）
+// 用户（可选，新订单默认当前用户）
 $shopping->user(1);
 
 // 留言

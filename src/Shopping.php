@@ -324,12 +324,13 @@ class Shopping
     public function save ()
     {
         $isNew = !$this->order()->id;
+        if ($isNew && !isset($this->order()->user_id)) {
+            $this->order()->user_id = request()->user()->id ?? null;
+        }
 
-        // save order
+        // save
         $this->computeOrderAmount();
         $this->order()->save();
-
-        // save items
         $this->items()->each(function ($item) {
             $item->order_id = $this->order()->id;
             $item->save();
