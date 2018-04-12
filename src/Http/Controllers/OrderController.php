@@ -3,6 +3,7 @@
 namespace Goodwong\Shop\Http\Controllers;
 
 use Goodwong\Shop\Entities\Order;
+use Goodwong\Shop\Shopping;
 use Illuminate\Http\Request;
 
 class OrderController extends Controller
@@ -42,8 +43,37 @@ class OrderController extends Controller
      */
     public function store(Request $request)
     {
-        $order = Order::create($request->all());
-        return $order;
+        // order
+        $order = new Order($request->only(['context', 'user_id', 'contacts', 'comment', 'expected_at']));
+        if (!isset($order->user_id)) {
+            $order->user_id = $request->user()->id ?? null;
+        }
+        $order->save();
+
+        // items...
+        // 接受 product_id / comment / specs / qty
+        // 这里根据业务需求，基本上都会重写
+        $shopping = (new Shopping)->load($order->id);
+        foreach ((array)$request->input('items') as $item) {
+            $product = Product::findOrFail($item['product_id']);
+            $shopping->withProduct($product);
+            if (isset($item['comment'])) {
+                $shopping->comment($item['comment']);
+            }
+            if (isset($item['specs'])) {
+                $shopping->specs($item['specs']);
+                // specs 如果影响价格，则需要在这里计算 row_total
+                // $shopping->rowTotal($computedRowTotal);
+            }
+            $shopping->add($item['qty'] ?? null);
+        }
+        // if ($request->input('coupon_id')) {
+        //     $coupon = Coupon::findOrFail($request->input('coupon_id'));
+        //     $discountAmount = $this->computeDiscount($shopping, $coupon);
+        //     $shopping->type('discount')->group('优惠')->name($coupon->name)->rowTotal($discountAmount)->add();
+        // }
+        $shopping->save();
+        return $shopping->toArray();
     }
 
     /**
@@ -67,7 +97,7 @@ class OrderController extends Controller
     public function update(Request $request, Order $order)
     {
         $order->update($request->all());
-        return $order;
+        return $order->load(['items', 'payments']);
     }
 
     /**

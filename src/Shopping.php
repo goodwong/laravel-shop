@@ -113,11 +113,13 @@ class Shopping
     public function withProduct ($product)
     {
         $this->temp = array_merge($this->temp, [
+            // 除了product_id，其他属性都不允许被product覆盖。因为这些属性特意指定，必定是特别强调的
             'type' => $this->temp['type'] ?? data_get($product, 'type'),
             'shop_id' => $this->temp['shop_id'] ?? data_get($product, 'shop_id'),
-            'product_id' => data_get($product, 'id'),
-            'name' => $this->temp['name'] ?? data_get($product, 'name'),
+            'product_id' => data_get($product, 'id') ?? data_get($this->temp, 'product_id'),
             'sku' => $this->temp['sku'] ?? data_get($product, 'sku'),
+            'group' => $this->temp['group'] ?? data_get($product, 'group'),
+            'name' => $this->temp['name'] ?? data_get($product, 'name'),
             'price' => $this->temp['price'] ?? data_get($product, 'price'),
             'unit' => $this->temp['unit'] ?? data_get($product, 'unit'),
         ]);
@@ -500,14 +502,9 @@ class Shopping
      */
     public function toArray ()
     {
-        $items = [];
-        foreach ($this->items as $item) {
-            $items[] = $item->toArray();
-        }
-        return [
-            'order' => $this->order ? $this->order->toArray() : null,
-            'items' => $items,
-        ];
+        $order = $this->order()->toArray();
+        $order['items'] = $this->items()->toArray();
+        return $order;
     }
 
     /**

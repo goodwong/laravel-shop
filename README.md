@@ -70,7 +70,7 @@ $shopping
 $shopping
     ->group('饮品')
     // 传入product对象，
-    // type/shop/name/sku/price/product_id/row_total 自动设置
+    // 自动设置 type/shop_id/product_id/sku/group/name/price/unit（除了qty/comment/specs），自动计算row_total
     // 后面还可以覆盖这些属性
     ->withProduct($product)
     ->unit('斤')
