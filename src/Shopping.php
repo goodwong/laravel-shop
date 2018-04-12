@@ -239,7 +239,7 @@ class Shopping
 
         // add
         $orderItem = new OrderItem($this->temp);
-        $this->items->push($orderItem);
+        $this->items()->push($orderItem);
         $this->computeOrderAmount();
 
         // clear
@@ -361,7 +361,7 @@ class Shopping
      * @param  string  $gatewayCode
      * @param  string  $description
      * @param  int  $amount 可选，指定支付金额，默认订单金额
-     * @return self
+     * @return GatewayInterface
      */
     public function charge (string $gatewayCode, string $description = null, int $amount = null)
     {
@@ -391,7 +391,7 @@ class Shopping
             throw $e;
         }
 
-        return $this;
+        return $payment;
     }
 
     /**
@@ -517,6 +517,8 @@ class Shopping
      */
     public function __toString ()
     {
+        $lineSize = 23;
+
         $order = $this->order();
         $items = $this->items();
 
@@ -527,7 +529,7 @@ class Shopping
         $lines[] = data_get($order, 'contacts.address_regions');
         $lines[] = data_get($order, 'contacts.address_detail');
         $lines[] = "\n【产品明细】";
-        $items = collect($items)->sortBy('group');
+        $items = collect($items);
         $groups = $items->pluck('group')->unique()->values()->all();
         foreach ($groups as $group) {
             if ($group) {
@@ -538,11 +540,30 @@ class Shopping
                     continue;
                 }
                 $unit = data_get($item, 'unit', '');
-                $lines[] = implode("  ", [
-                    $item->name,
-                    $item->qty ? "x {$item->qty}{$unit}" : '',
-                    $item->row_total ? number_format($item->row_total / 100, 2) . "元" : '',
-                ]);
+                $part1 = "·" . $item->name . ($item->qty ? " x{$item->qty}{$unit}" : '');
+                $part1 = $this->mb_chunk_split($part1, $lineSize);
+                $comment = data_get($item, 'comment');
+                $comment = $comment ? "({$comment})" : '';
+                $comment = $this->mb_chunk_split($comment, $lineSize);
+                $rowTotal = $item->row_total ? number_format($item->row_total / 100, 2) . "元" : '';
+                if ($comment) {
+                    $lines[] = implode("\n", $part1);
+                    $rowTotalLen = $lineSize - mb_strwidth($comment[count($comment)-1]);
+                    if ($rowTotalLen < mb_strwidth($rowTotal)) {
+                        $comment[count($comment)-1] .= "\n";
+                        $rowTotalLen = $lineSize;
+                    }
+                    $rowTotal = str_pad($rowTotal, $rowTotalLen, ' ', STR_PAD_LEFT);
+                    $lines[] = implode("\n", $comment) . $rowTotal;
+                } else {
+                    $rowTotalLen = $lineSize - mb_strwidth($part1[count($part1)-1]);
+                    if ($rowTotalLen < mb_strwidth($rowTotal)) {
+                        $part1[count($part1)-1] .= "\n";
+                        $rowTotalLen = $lineSize;
+                    }
+                    $rowTotal = str_pad($rowTotal, $rowTotalLen, ' ', STR_PAD_LEFT);
+                    $lines[] = implode("\n", $part1) . $rowTotal;
+                }
             }
         }
         $lines[] = "\n【费用】";
@@ -550,5 +571,31 @@ class Shopping
         $lines[] = "总计" . number_format(data_get($order, 'grand_total') / 100, 2) . "元";
         $lines[] = "**********************/";
         return implode("\n", $lines);
+    }
+
+    /** 
+     * 分割字符串
+     * 
+     * @param  string  $str  要分割的字符串  
+     * @param  int     $chunkSize  指定的长度
+     * @return array
+     */  
+    function mb_chunk_split (string $string, int $chunkSize) {  
+        $chunks = [];
+        $chunk = '';
+        $strLen = mb_strlen($string);
+        while ($strLen) {
+            $chunk .= mb_substr($string, 0, 1, "utf-8");
+            $string = mb_substr($string, 1, $strLen, "utf-8");
+            $strLen = mb_strlen($string);
+            if (mb_strwidth($chunk) >= $chunkSize) {
+                $chunks[] = $chunk;
+                $chunk = '';
+            }
+        }
+        if ($chunk) {
+            $chunks[] = $chunk;
+        }
+        return $chunks;
     }
 }

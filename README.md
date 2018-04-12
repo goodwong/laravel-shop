@@ -57,7 +57,7 @@ $shopping->load($order_id);
 ```php
 // 简单操作
 $shopping
-    ->product($product)
+    ->withProduct($product)
     ->add($qty = 1);
 
 $shopping
@@ -72,7 +72,7 @@ $shopping
     // 传入product对象，
     // type/shop/name/sku/price/product_id/row_total 自动设置
     // 后面还可以覆盖这些属性
-    ->product($product)
+    ->withProduct($product)
     ->unit('斤')
     ->rowTotal(15000) // 覆盖 price * qty
     // 自定义选项内容（结构自定），使用嵌套数据表示
@@ -86,7 +86,7 @@ $shopping
     ->type('service')
     ->group('服务')
     ->shop('service')
-    ->productId($productId)
+    ->product($productId)
     ->name('洗车+全套护理') // 必填
     ->sku('SRV-SZ-CLN-009-PLUS-502')
     ->price(58000)
@@ -179,26 +179,45 @@ $shopping->items();
 $shopping->payments();
 
 // 打印（调试用）
+$shopping = app('Goodwong\Shop\Shopping');
+$shopping->contacts([
+    'name' => '老小王',
+    'telephone' => '135****4266',
+    'address_regions' => '江西省 会昌县 马甲镇',
+    'address_detail' => '冰球村122号',
+]);
+$shopping->type('product')->shop('fruit')->group('水果')->name('苹果')->price(1500)->unit('斤')->add(1);
+$shopping->type('product')->shop('vegetable')->group('蔬菜')->name('鸡蛋')->price(200)->unit('个')->comment('请帮忙多套几个袋子，谢谢')->add(2);
+$shopping->type('product')->shop('vegetable')->group('蔬菜')->name('带水晶香味的长白山紫甘蓝')->price(1000)->unit('颗')->rowTotal(1800)->comment('9折')->add(2);
+$shopping->type('product')->shop('service')->group('其它')->name('打包')->rowTotal(2500)->add(3);
+$shopping->type('product')->shop('service')->group('其它')->name('运费')->rowTotal(500)->add();
+$shopping->type('product')->shop('fee')->group('其它')->name('会员优惠')->rowTotal(-360)->add();
+
 echo $shopping;
+// 输出：
 /**********************
-  【地址】
-  老小王 135****4266
-  江西省 会昌县 马甲镇
-  冰球村 122号
-  
-  【产品明细】
-  --- 水果 ---
-  苹果  x 1斤  15.00元
-  --- 蔬菜 ---
-  鸡蛋  x 2个   4.00元
-  紫甘蓝 x 2颗 18.00元
-  打包   x 3   25.00元
-  --- 其它 ---
-  运费         5.00元
-  会员优惠     -3.60元
-  
-  【费用】
-  总计        19.00元
+【联系信息】
+老小王 135****4266
+江西省 会昌县 马甲镇
+冰球村122号
+
+【产品明细】
+--- 水果 ---
+·苹果 x1斤     15.00元
+--- 蔬菜 ---
+·鸡蛋 x2个
+(请帮忙多套几个袋子，谢
+谢)             4.00元
+·带水晶香味的长白山紫甘
+蓝 x2颗
+(9折)          18.00元
+--- 其它 ---
+·打包 x3       25.00元
+·运费           5.00元
+·会员优惠      -3.60元
+
+【费用】
+总计63.40元
 **********************/
 ```
 
