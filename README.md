@@ -1,6 +1,6 @@
 # Laravel 5 Shop
 
-基本的商家、订单结构 **`（未完成）`**
+基本的商家、订单结构
 
 > 1. 产品图片上传依赖 php-gd 扩展，依赖 Intervention Image 包
 
