@@ -249,6 +249,24 @@ echo $shopping;
 > 2. 建议继承 `Goodwong\Shop\Gateways\GatewayBase`
 > 3. 添加到 `config/shop.php` 的 `gateways`数组
 
+#### 编写支付网关须知
+> 1. 网关只需要了解传入参数的 `Order` 对象
+> 2. 一个订单号可以发起多次支付，使用`getSerialNumber()`生成每次支付的商家流水号，并且需要`$this->setTransactionId($serial_number)` 将流水号传递到订单系统。
+```php
+$serial_number = $this->getSerialNumber($order);
+$attributes = [
+    // 'trade_type'       => 'NATIVE', // JSAPI，NATIVE，APP...
+    // 'detail'           => 'iPad mini 16G 白色',
+    'out_trade_no'     => $serial_number,
+    // ...
+];
+$this->setTransactionId($serial_number);
+```
+> 3. 发起支付、支付完成、支付失败，通过以下方法将信息传递到订单系统。
+```php
+$this->setTransactionData($result);
+$this->setTransactionStatus('failure');
+```
 
 
 
