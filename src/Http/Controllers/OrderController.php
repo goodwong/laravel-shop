@@ -3,6 +3,7 @@
 namespace Goodwong\Shop\Http\Controllers;
 
 use Goodwong\Shop\Entities\Order;
+use Goodwong\Shop\Entities\Product;
 use Goodwong\Shop\Shopping;
 use Illuminate\Http\Request;
 
@@ -44,16 +45,25 @@ class OrderController extends Controller
     public function store(Request $request)
     {
         // order
-        $order = new Order($request->only(['context', 'user_id', 'contacts', 'comment', 'expected_at']));
-        if (!isset($order->user_id)) {
-            $order->user_id = $request->user()->id ?? null;
+        // 接受：context / user_id / contacts / comment / expected_at
+        $shopping = (new Shopping)
+            ->contacts($request->input('contacts'));
+        if ($request->input('comment')) {
+            $shopping->orderComment($request->input('comment'));
         }
-        $order->save();
+        if ($request->input('user_id')) {
+            $shopping->user($request->input('user_id'));
+        }
+        if ($request->input('context')) {
+            $shopping->order()->context = $request->input('context');
+        }
+        if ($request->input('expected_at')) {
+            $shopping->order()->expected_at = $request->input('expected_at');
+        }
 
         // items...
         // 接受 product_id / comment / specs / qty
         // 这里根据业务需求，基本上都会重写
-        $shopping = (new Shopping)->load($order->id);
         foreach ((array)$request->input('items') as $item) {
             $product = Product::findOrFail($item['product_id']);
             $shopping->withProduct($product);
@@ -67,6 +77,8 @@ class OrderController extends Controller
             }
             $shopping->add($item['qty'] ?? null);
         }
+
+        // coupon...
         // if ($request->input('coupon_id')) {
         //     $coupon = Coupon::findOrFail($request->input('coupon_id'));
         //     $discountAmount = $this->computeDiscount($shopping, $coupon);
