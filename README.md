@@ -245,29 +245,29 @@ echo $shopping;
 
 ### 创建自定义支付网关
 
-> 1. 实现接口 `Goodwong\Shop\Contracts\GatewayInterface`
-> 2. 建议继承 `Goodwong\Shop\Gateways\GatewayBase`
+#### 三部曲
+> 1. 继承 `Goodwong\Shop\Gateways\GatewayBase`
+> 2. 或者实现接口 `Goodwong\Shop\Contracts\GatewayInterface`
 > 3. 添加到 `config/shop.php` 的 `gateways`数组
 
-#### 编写支付网关须知
-> 1. 网关只需要了解传入参数的 `Order` 对象
-> 2. 一个订单号可以发起多次支付，使用`getSerialNumber()`生成每次支付的商家流水号，并且需要`$this->setTransactionId($serial_number)` 将流水号传递到订单系统。
+#### `GatewayBase` 代码细节
+> 1. 最重要的是实现`onCharge()`、`onCallback()`这两个方法
+> 1. 稍微了解传入参数 `Order` 对象，主要是 `$order->id`和`$order->grand_total`。
+> 2. 一个订单号有可能多次发起支付，每次发起支付建议使用`$this->getSerialNumber($order)`生成商家流水号。
+> 4. 使用`$this->setTransactionId($serial_number)` 将流水号传递到订单系统。
 ```php
 $serial_number = $this->getSerialNumber($order);
-$attributes = [
-    // 'trade_type'       => 'NATIVE', // JSAPI，NATIVE，APP...
-    // 'detail'           => 'iPad mini 16G 白色',
-    'out_trade_no'     => $serial_number,
-    // ...
-];
+// 使用 $serial_number 发起支付请求……
 $this->setTransactionId($serial_number);
 ```
-> 3. 发起支付、支付完成、支付失败，通过以下方法将信息传递到订单系统。
+> 3. 发起支付、支付完成、支付失败，通过以下方法将信息传递到订单系统就好啦，其他不用管。
 ```php
 $this->setTransactionData($result);
-$this->setTransactionStatus('failure');
+$this->setTransactionStatus('failure'); // success | failure
 ```
 
+#### 举个例子……
+[goodwong/laravel-shop-gateway-wxpay](https://github.com/goodwong/laravel-shop-gateway-wxpay)，是真的可以用的喔～
 
 
 ## 更多功能（待实现……）
