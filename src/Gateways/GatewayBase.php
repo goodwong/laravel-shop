@@ -112,11 +112,11 @@ abstract class GatewayBase implements GatewayInterface
      * called on charge
      * 
      * @param  \Goodwong\Shop\Entities\Order  $order
-     * @param  string  $brief
-     * @param  integer  $amount
+     * @param  int  $amount
+     * @param  array  $params
      * @return void
      */
-    abstract public function onCharge(Order $order, $brief, $amount);
+    abstract public function onCharge(Order $order, int $amount, array $params = []);
 
     /**
      * called on callback

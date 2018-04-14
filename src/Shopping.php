@@ -361,11 +361,11 @@ class Shopping
      * charge
      * 
      * @param  string  $gatewayCode
-     * @param  string  $description
      * @param  int  $amount 可选，指定支付金额，默认订单金额
+     * @param  array $params 包含支付所需要的其它参数，比如微信支付的商家名称、用户openid等等
      * @return GatewayInterface
      */
-    public function charge (string $gatewayCode, string $description = null, int $amount = null)
+    public function charge (string $gatewayCode, int $amount = null, array $params = [])
     {
         // check
         $order = $this->order();
@@ -383,7 +383,7 @@ class Shopping
 
         try {
             $gateway = $this->getGateway($gatewayCode, $payment->id);
-            $gateway->onCharge($order, $description ?? "支付订单#{$payment->order_id}", $payment->amount);
+            $gateway->onCharge($order, $payment->amount, $params);
 
             // update...
             $this->updatePaymentFromGateway($payment, $gateway);
@@ -435,7 +435,7 @@ class Shopping
         if ($className && class_exists($className)) {
             return new $className($gatewayCode, $payment_id);
         }
-        throw new Exception('invalid gateway: ' . $gateway);
+        throw new Exception('invalid gateway: ' . $gatewayCode);
     }
 
     /**

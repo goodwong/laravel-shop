@@ -11,10 +11,10 @@ interface GatewayInterface
      * constructor
      * 
      * @param  string  $gateway_id
-     * @param  integer  $payment_id
+     * @param  int  $payment_id
      * @return void
      */
-    public function __construct($gateway_id, $payment_id);
+    public function __construct(string $gateway_id, int $payment_id);
 
     /**
      * get payment id
@@ -38,11 +38,11 @@ interface GatewayInterface
      * called on charge
      * 
      * @param  \Goodwong\Shop\Entities\Order  $order
-     * @param  string  $brief
-     * @param  integer  $amount
+     * @param  int  $amount
+     * @param  array  $params 包含支付所需要的其它参数，比如微信支付的商家名称、用户openid等等
      * @return void
      */
-    public function onCharge(Order $order, $brief, $amount);
+    public function onCharge(Order $order, int $amount, array $params = []);
 
     /**
      * called on callback

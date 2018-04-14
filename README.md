@@ -149,10 +149,13 @@ $shopping->load($order_id);
 > `$gateway_code` 需要在 `config/shop.php` 预先配置
 ```php
 // 默认全额支付
-$shopping->charge($gateway_code = 'wxpay_native', $brief = '小农家-会员充值');
+$shopping->charge($gateway_code = 'wxpay_native');
 
 // 也可以指定支付金额$amount
-$shopping->charge($gateway_code = 'wxpay_native', $brief = '小农家-会员充值', $amount = null);
+$shopping->charge($gateway_code = 'wxpay_native', $amount = 18800);
+
+// 带上其它支付网管需要的参数（不同支付网关需要的参数不同）
+$shopping->charge($gateway_code = 'wxpay_jsapi', $amount = 18800, [ 'title' => '小农家商店', 'openid' => 'xxxxlxxxxlxxxxlxxxxlxxxx']);
 ```
 
 ### 支持链式调用
