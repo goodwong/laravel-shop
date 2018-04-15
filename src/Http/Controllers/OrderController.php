@@ -68,7 +68,7 @@ class OrderController extends Controller
             $product = Product::findOrFail($item['product_id']);
             $shopping->withProduct($product);
             if (isset($item['group'])) {
-                $shopping->comment($item['group']);
+                $shopping->group($item['group']);
             }
             if (isset($item['comment'])) {
                 $shopping->comment($item['comment']);
