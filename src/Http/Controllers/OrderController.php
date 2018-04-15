@@ -62,11 +62,14 @@ class OrderController extends Controller
         }
 
         // items...
-        // 接受 product_id / comment / specs / qty
+        // 接受 group / product_id / comment / specs / qty
         // 这里根据业务需求，基本上都会重写
         foreach ((array)$request->input('items') as $item) {
             $product = Product::findOrFail($item['product_id']);
             $shopping->withProduct($product);
+            if (isset($item['group'])) {
+                $shopping->comment($item['group']);
+            }
             if (isset($item['comment'])) {
                 $shopping->comment($item['comment']);
             }
@@ -85,7 +88,7 @@ class OrderController extends Controller
         //     $shopping->type('discount')->group('优惠')->name($coupon->name)->rowTotal($discountAmount)->add();
         // }
         $shopping->save();
-        return $shopping->toArray();
+        return $shopping;
     }
 
     /**

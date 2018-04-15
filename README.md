@@ -196,7 +196,7 @@ $shopping->type('product')->shop('service')->group('其它')->name('打包')->ro
 $shopping->type('product')->shop('service')->group('其它')->name('运费')->rowTotal(500)->add();
 $shopping->type('product')->shop('fee')->group('其它')->name('会员优惠')->rowTotal(-360)->add();
 
-echo $shopping;
+echo $shopping->print();
 // 输出：
 /**********************
 【联系信息】
@@ -222,6 +222,9 @@ echo $shopping;
 【费用】
 总计63.40元
 **********************/
+
+// 有实现 _toString()，因此可以在Controller里面
+return $shopping;
 ```
 
 

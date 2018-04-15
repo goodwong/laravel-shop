@@ -55,6 +55,16 @@ class Shopping
     }
 
     /**
+     * get payments
+     * 
+     * @return Collection
+     */
+    public function payments ()
+    {
+        return $this->order()->payments;
+    }
+
+    /**
      * load order with items
      * 
      * @param  int  $order_id
@@ -513,6 +523,16 @@ class Shopping
      * @return string
      */
     public function __toString ()
+    {
+        return json_encode($this->toArray());
+    }
+
+    /**
+     * print
+     * 
+     * @return string
+     */
+    public function print ()
     {
         $lineSize = 23;
 
