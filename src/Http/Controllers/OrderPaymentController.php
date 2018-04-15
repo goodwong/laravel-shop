@@ -4,7 +4,7 @@ namespace Goodwong\Shop\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Goodwong\Shop\Entities\OrderPayment;
-use Goodwong\Shop\Handlers\OrderHandler;
+use Goodwong\Shop\Shopping;
 use Illuminate\Http\Request;
 
 class OrderPaymentController extends Controller
@@ -89,13 +89,12 @@ class OrderPaymentController extends Controller
      * callback from gateway
      * 
      * @param  \Illuminate\Http\Request  $request
-     * @param  integer  $id
+     * @param  integer  $payment_id
      * @return \Illuminate\Http\Response
      */
-    public function callback(Request $request, $id)
+    public function callback(Request $request, $payment_id)
     {
-        $payment = OrderPayment::findOrFail($id);
-        $handler = new OrderHandler;
-        return $handler->load($payment->order_id)->callback($request, $id);
+        $payment = OrderPayment::findOrFail($payment_id);
+        return (new Shopping)->load($payment->order_id)->callback($request, $payment_id);
     }
 }
