@@ -19,7 +19,7 @@ class OrderController extends Controller
     {
         $per_page = $request->input('per_page', 15);
 
-        $query = Order::getModel();
+        $query = Order::getModel()->orderBy('id', 'desc');
         if ($user_id = $request->input('user')) {
             $query = $query->where('user_id', $user_id);
         }
