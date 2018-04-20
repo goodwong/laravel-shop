@@ -260,6 +260,30 @@ class Shopping
     }
 
     /**
+     * set order context
+     * 
+     * @param  string  $context
+     * @return self
+     */
+    public function context (string $context)
+    {
+        $this->order()->context = $context;
+        return $this;
+    }
+
+    /**
+     * set order currency
+     * 
+     * @param  string  $currency
+     * @return self
+     */
+    public function currency (string $currency)
+    {
+        $this->order()->currency = $currency;
+        return $this;
+    }
+
+    /**
      * set user id
      * 
      * @param  int  $userId
@@ -331,7 +355,7 @@ class Shopping
     /**
      * save order and it's items
      * 
-     * @return void
+     * @return self
      */
     public function save ()
     {
@@ -352,6 +376,19 @@ class Shopping
         if ($isNew) {
             event(new OrderCreated($this->order()));
         }
+        return $this;
+    }
+
+    /**
+     * soft delete order & items & payments
+     * 
+     * @return void
+     */
+    public function delete ()
+    {
+        $this->order()->delete();
+        $this->order()->items->each->delete();
+        $this->order()->payments->each->delete();
     }
 
     /**
@@ -373,7 +410,7 @@ class Shopping
      * @param  string  $gatewayCode
      * @param  int  $amount 可选，指定支付金额，默认订单金额
      * @param  array $params 包含支付所需要的其它参数，比如微信支付的商家名称、用户openid等等
-     * @return GatewayInterface
+     * @return OrderPayment
      */
     public function charge (string $gatewayCode, int $amount = null, array $params = [])
     {
@@ -389,21 +426,45 @@ class Shopping
             'order_id' => $order->id,
             'amount' => $amount ?? $order->grand_total,
             'gateway' => $gatewayCode,
+            'comment' => $params['comment'] ?? '',
+            'transaction_id' => $this->getSerialNumber($order),
         ]);
 
+        $params = array_merge($params, [
+            'order_id' => $order->id,
+            'payment_id' => $payment->id,
+            'payment_serial' => $payment->transaction_id,
+            'amount' => abs($payment->amount),
+        ]);
         try {
             $gateway = $this->getGateway($gatewayCode, $payment->id);
-            $gateway->onCharge($order, $payment->amount, $params);
+            $gateway->onCharge($params);
 
             // update...
             $this->updatePaymentFromGateway($payment, $gateway);
             $this->updateOrderAfterPaid($payment);
+
+            // check
+            if ($payment->status === 'failure') {
+                throw new \Exception(json_encode($payment->data));
+            }
         } catch (Exception $e) {
-            $payment->update(['status' => 'failure', 'comment' => substr($e->getMessage(), 0, 255),]);
+            $payment->update(['status' => 'failure', 'data' => $e->getMessage(),]);
             throw $e;
         }
 
         return $payment;
+    }
+
+    /**
+     * get payment serial number
+     * 
+     * @param  \Goodwong\Shop\Entities\Order  $order
+     * @return string
+     */
+    protected function getSerialNumber(Order $order)
+    {
+        return 'OD' . date('YmdHis') . str_pad($order->id, 8, '0', STR_PAD_LEFT);
     }
 
     /**
@@ -425,7 +486,8 @@ class Shopping
             $this->updatePaymentFromGateway($payment, $gateway);
             $this->updateOrderAfterPaid($payment);
         } catch (Exception $e) {
-            $payment->update(['status' => 'failure', 'comment' => substr($e->getMessage(), 0, 255),]);
+            // 异常不是业务结果，不允许覆盖掉原有的data
+            // $payment->update(['status' => 'failure', 'data' => (array)$e->getMessage(),]);
             abort(500, $e->getMessage());
         }
 
@@ -443,7 +505,7 @@ class Shopping
     {
         $className = config("shop.gateways.{$gatewayCode}");
         if ($className && class_exists($className)) {
-            return new $className($gatewayCode, $payment_id);
+            return new $className($payment_id);
         }
         throw new Exception('invalid gateway: ' . $gatewayCode);
     }
@@ -457,15 +519,11 @@ class Shopping
      */
     private function updatePaymentFromGateway (OrderPayment $payment, GatewayInterface $gateway)
     {
-        $data = $gateway->getTransactionData();
+        $data = $gateway->result();
         if ($data) {
             $payment->data = $data;
         }
-        $transaction_id = $gateway->getTransactionId();
-        if ($transaction_id) {
-            $payment->transaction_id = $transaction_id;
-        }
-        $transaction_status = $gateway->getTransactionStatus();
+        $transaction_status = $gateway->status();
         if ($transaction_status) {
             $payment->status = $transaction_status;
         }
@@ -503,6 +561,93 @@ class Shopping
 
         // dispatch event
         event(new OrderPaid($order, $payment));
+    }
+
+    /**
+     * refund
+     * 
+     * @param  int  $amount
+     * @param  array  $params { comment }
+     * @return OrderPayment
+     */
+    public function refund ($amount = null, $params = [])
+    {
+        $amount = $amount ?? $this->order()->paid_total;
+        if (!$amount) {
+            throw new Exception('no paid amount to refund!');
+        }
+
+        // 基本上都是一次行付清的，所以这里只查找最近一次付款记录哈
+        $order = $this->order();
+        $lastPayment = OrderPayment::orderBy('id', 'desc')
+            ->where('status', 'success')
+            ->where('order_id', $order->id)
+            ->first();
+
+        // refund...
+        $refund = OrderPayment::create([
+            'order_id' => $order->id,
+            'amount' => -($amount ?? $order->paid_total),
+            'gateway' => $lastPayment->gateway,
+            'comment' => $params['comment'] ?? '',
+            'transaction_id' => "{$lastPayment->transaction_id}-" . date('YmdHis'),
+        ]);
+
+        $params = array_merge($params, [
+            'order_id' => $order->id,
+            'payment_id' => $refund->id,
+            'payment_serial' => $lastPayment->transaction_id,
+            'refund_serial' => $refund->transaction_id,
+            'paid_total' => $lastPayment->amount,
+            'amount' => abs($refund->amount),
+        ]);
+        try {
+            $gateway = $this->getGateway($lastPayment->gateway, $refund->id);
+            $gateway->onRefund($params);
+
+            // update...
+            $this->updatePaymentFromGateway($refund, $gateway);
+            $this->updateOrderAfterRefund($refund);
+
+            // check
+            if ($refund->status === 'failure') {
+                throw new \Exception(json_encode($refund->data));
+            }
+        } catch (Exception $e) {
+            $refund->update(['status' => 'failure', 'data' => $e->getMessage(),]);
+            throw $e;
+        }
+
+        return $refund;
+    }
+
+    /**
+     * update order status after refund
+     * 
+     * @param  OrderPayment  $payment
+     * @return void
+     */
+    private function updateOrderAfterRefund (OrderPayment $payment)
+    {
+        // check
+        if (!$this->order()->id) {
+            throw new Exception('order_id empty!');
+        }
+        if ($payment->status !== 'success') {
+            return;
+        }
+
+        // update
+        $order = $this->order();
+        $paid_total = $order->payments->where('status', 'success')->sum('amount');
+        $order->paid_total = $paid_total;
+
+        $amount = '¥' . number_format($payment->amount / 100, 2);
+        $this->record("退款{$amount}成功！");
+        $order->save();
+
+        // dispatch event
+        // event(new OrderRefund($order, $payment));
     }
 
     /**

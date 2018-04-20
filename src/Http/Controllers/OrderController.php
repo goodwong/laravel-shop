@@ -148,7 +148,7 @@ class OrderController extends Controller
      */
     public function destroy(Order $order)
     {
-        $order->delete();
+        (new Shopping)->load($order->id)->delete();
         return response('deleted!', 204);
     }
 }

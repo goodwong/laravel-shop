@@ -21,6 +21,7 @@ class OrderPayment extends Model
         'order_id',
         'amount',
         'gateway',
+        'transaction_id',
         'status',
         'comment',
         'data',

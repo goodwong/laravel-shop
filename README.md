@@ -115,6 +115,12 @@ $shopping
 
 ### 设置订单信息
 ```php
+// 场景
+$shopping->context('product');
+
+// 货币
+$shopping->currency('CNY');
+
 // 联系方式（格式自定）
 $shopping->contacts([
     'name'=>'william',
@@ -136,16 +142,19 @@ $shopping->status($status = 'paying');
 $shopping->record('place holder...');
 ```
 
-### 保存 & 载入
+### 保存 & 载入 & 删除(soft)
 ```php
 // 保存
 $shopping->save();
 
 // 从数据库载入
 $shopping->load($order_id);
+
+// 删除(soft，附带删除item/payments)
+$shopping->delete();
 ```
 
-### 支付
+### 支付 & 退款
 > `$gateway_code` 需要在 `config/shop.php` 预先配置
 ```php
 // 默认全额支付
@@ -155,7 +164,15 @@ $shopping->charge($gateway_code = 'wxpay_native');
 $shopping->charge($gateway_code = 'wxpay_native', $amount = 18800);
 
 // 带上其它支付网管需要的参数（不同支付网关需要的参数不同）
-$shopping->charge($gateway_code = 'wxpay_jsapi', $amount = 18800, [ 'title' => '小农家商店', 'openid' => 'xxxxlxxxxlxxxxlxxxxlxxxx']);
+$shopping->charge($gateway_code = 'wxpay_jsapi', $amount = 18800, [
+    'comment' => '小农家商店', // 会记录在order_payments表中
+    'openid' => 'xxxxlxxxxlxxxxlxxxxlxxxx'
+]);
+
+// 退款
+$shopping->refund(); // 默认退全款
+$shopping->refund($amount = 11300); // 部分退款
+$shopping->refund(null, [ 'comment' => '臣妾做不到。。。' ]); // 退款理由
 ```
 
 ### 支持链式调用
@@ -249,24 +266,23 @@ return $shopping;
 ### 创建自定义支付网关
 
 #### 三部曲
-> 1. 继承 `Goodwong\Shop\Gateways\GatewayBase`
-> 2. 或者实现接口 `Goodwong\Shop\Contracts\GatewayInterface`
-> 3. 添加到 `config/shop.php` 的 `gateways`数组
+> 1. 继承 `Goodwong\Shop\Gateways\GatewayBase`，或者实现接口 `Goodwong\Shop\Contracts\GatewayInterface`
+> 2. 添加网关配置到 `config/shop.php` 的 `gateways`数组
 
 #### `GatewayBase` 代码细节
 > 1. 最重要的是实现`onCharge()`、`onCallback()`这两个方法
-> 1. 稍微了解传入参数 `Order` 对象，主要是 `$order->id`和`$order->grand_total`。
-> 2. 一个订单号有可能多次发起支付，每次发起支付建议使用`$this->getSerialNumber($order)`生成商家流水号。
-> 4. 使用`$this->setTransactionId($serial_number)` 将流水号传递到订单系统。
+> 2. 获取支付结果回调地址
 ```php
-$serial_number = $this->getSerialNumber($order);
-// 使用 $serial_number 发起支付请求……
-$this->setTransactionId($serial_number);
+$this->callbackUrl();
 ```
 > 3. 发起支付、支付完成、支付失败，通过以下方法将信息传递到订单系统就好啦，其他不用管。
 ```php
-$this->setTransactionData($result);
-$this->setTransactionStatus('failure'); // success | failure
+// 传递数据
+$this->result($resultFromGateway);
+// 设置状态
+$this->pendding();
+$this->success();
+$this->failure();
 ```
 
 #### 举个例子……
