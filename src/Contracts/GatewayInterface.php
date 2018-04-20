@@ -3,46 +3,38 @@
 namespace Goodwong\Shop\Contracts;
 
 use Illuminate\Http\Request;
-use Goodwong\Shop\Entities\Order;
 
 interface GatewayInterface
 {
     /**
      * constructor
      * 
-     * @param  string  $gateway_id
      * @param  int  $payment_id
      * @return void
      */
-    public function __construct(string $gateway_id, int $payment_id);
-
-    /**
-     * get payment id
-     * @return string
-     */
-    public function getTransactionId();
+    public function __construct (int $payment_id);
 
     /**
      * get payment status
      * @return string
      */
-    public function getTransactionStatus();
+    public function status ();
 
     /**
-     * get payment data
+     * set or get payment data
+     * 
+     * @param  mixed  $result
      * @return array
      */
-    public function getTransactionData();
+    public function result ($result = null);
 
     /**
      * called on charge
      * 
-     * @param  \Goodwong\Shop\Entities\Order  $order
-     * @param  int  $amount
      * @param  array  $params 包含支付所需要的其它参数，比如微信支付的商家名称、用户openid等等
      * @return void
      */
-    public function onCharge(Order $order, int $amount, array $params = []);
+    public function onCharge (array $params);
 
     /**
      * called on callback
@@ -50,5 +42,13 @@ interface GatewayInterface
      * @param  Illuminate\Http\Request  $request
      * @return void
      */
-    public function onCallback(Request $request);
+    public function onCallback (Request $request);
+
+    /**
+     * on refund
+     * 
+     * @param  array  $params
+     * @return void
+     */
+    public function onRefund (array $params);
 }

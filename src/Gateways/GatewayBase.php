@@ -3,28 +3,15 @@
 namespace Goodwong\Shop\Gateways;
 
 use Illuminate\Http\Request;
-use Goodwong\Shop\Entities\Order;
 use Goodwong\Shop\Contracts\GatewayInterface;
 
 abstract class GatewayBase implements GatewayInterface
 {
     /**
-     * gateway id
-     * @var string
-     */
-    protected $gateway_id = null;
-
-    /**
      * payment id, gererated by database auto increment primary key
      * @var string
      */
     protected $payment_id = null;
-
-    /**
-     * transaction_id, provided by gateway
-     * @var string
-     */
-    protected $transaction_id = null;
 
     /**
      * transaction_status
@@ -41,82 +28,71 @@ abstract class GatewayBase implements GatewayInterface
     /**
      * Constructor 
      * 
-     * @param  string  $gateway_id
-     * @param  integer  $payment_id
+     * @param  int  $payment_id
      * @return void
      */
-    public function __construct($gateway_id, $payment_id)
+    public function __construct (int $payment_id)
     {
-        $this->gateway_id = $gateway_id;
         $this->payment_id = $payment_id;
     }
 
     /**
-     * set transaction id
-     * @param  string
-     * @return this
+     * pendding
+     * @return void
      */
-    final protected function setTransactionId($transaction_id)
+    final protected function pendding ()
     {
-        $this->transaction_id = $transaction_id;
+        $this->transaction_status = 'pendding';
     }
 
-     /**
-     * set transaction status
-     * @param  string
-     * @return this
+    /**
+     * success
+     * @return void
      */
-    final protected function setTransactionStatus($transaction_status)
+    final protected function success ()
     {
-        $this->transaction_status = $transaction_status;
+        $this->transaction_status = 'success';
+    }
+
+    /**
+     * failure
+     * @return void
+     */
+    final protected function failure ()
+    {
+        $this->transaction_status = 'failure';
     }
 
     /**
      * set transaction data
-     * @param  array
-     * @return this
+     * @param  mixed  $data
+     * @return array|void
      */
-    final protected function setTransactionData($transaction_data)
+    final public function result ($data = null)
     {
-        $this->transaction_data = $transaction_data;
-    }
-
-    /**
-     * get transaction id
-     * @return string
-     */
-    final public function getTransactionId()
-    {
-        return $this->transaction_id;
+        if ($data) {
+            $this->transaction_data = $data;
+        } else {
+            return $this->transaction_data;
+        }
     }
 
      /**
      * get transaction status
      * @return string
      */
-    final public function getTransactionStatus()
+    final public function status ()
     {
         return $this->transaction_status;
     }
 
     /**
-     * get transaction data
-     * @return array
-     */
-    final public function getTransactionData()
-    {
-        return $this->transaction_data;
-    }
-
-    /**
      * called on charge
      * 
-     * @param  \Goodwong\Shop\Entities\Order  $order
-     * @param  int  $amount
      * @param  array  $params
      * @return void
      */
-    abstract public function onCharge(Order $order, int $amount, array $params = []);
+    abstract public function onCharge (array $params);
 
     /**
      * called on callback
@@ -124,17 +100,20 @@ abstract class GatewayBase implements GatewayInterface
      * @param  Illuminate\Http\Request  $request
      * @return Response
      */
-    abstract public function onCallback(Request $request);
+    public function onCallback (Request $request)
+    {
+        return response('nothing...');
+    }
 
     /**
-     * get payment serial number
+     * on refund
      * 
-     * @param  \Goodwong\Shop\Entities\Order  $order
-     * @return string
+     * @param  array  $params
+     * @return void
      */
-    protected function getSerialNumber(Order $order)
+    public function onRefund (array $params)
     {
-        return 'OD' . date('YmdHis') . str_pad($order->id, 8, '0', STR_PAD_LEFT);
+        //
     }
 
     /**
@@ -143,24 +122,10 @@ abstract class GatewayBase implements GatewayInterface
      * 
      * @return string
      */
-    final protected function getCallbackUrl()
+    final protected function callbackUrl ()
     {
         return route(config('shop.payment_callback_route'), [
             'payment_id'     => $this->payment_id,
         ]);
     }
-
-    /**
-     * get redirect url
-     * 有些当场回调到商家页面的，使用redirect方法
-     * 
-     * @param  \Goodwong\Shop\Entities\Order  $order
-     * @return string
-     */
-    // final protected function getRedirectUrl(Order $order)
-    // {
-    //     return route(config('shop.payment_redirect_route'), [
-    //         'order_id'     => $order->id,
-    //     ]);
-    // }
 }
