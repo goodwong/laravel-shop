@@ -431,8 +431,8 @@ class Shopping
         ]);
 
         $params = array_merge($params, [
+            'user_id' => $order->user_id,
             'order_id' => $order->id,
-            'payment_id' => $payment->id,
             'payment_serial' => $payment->transaction_id,
             'amount' => abs($payment->amount),
         ]);

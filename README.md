@@ -291,4 +291,20 @@ $this->failure();
 
 ## 更多功能（待实现……）
 > 1. 优惠券（限制：限商店、限品类、限单品，类型：折扣券、兑换券）
+
 > 2. 支付成功后（需要全款）的订单状态可以在配置文件里设置
+
+> 3. 分离支付表格，支付不仅仅可以支付订单，也可以支付任何实体，如：  
+    调用方式  
+    ```php
+    $shopping->payFor($voting)->charge('wxpay_jsapi', 15000, ['comment' => '小农家 - 打赏金'， 'openid' => 'xxxx']);
+    ```  
+    数据结构  
+    - 1. `shop_order_payments`表格改名：`shop_payments`  
+    - 2. `shop_payments` 增加一列 `parmas:jsonb`，除了支付参数外，还存储一些服务性参数
+    - 3. `order_id` 改为 `payable_type`+`payable_id`  
+    ```  
+    支付回调  
+    相应的也需要分离，纯粹更新`payment`状态，`Order`再通过监听`PaymentPaid`事件来更新订单状态
+
+> 4. ~~`shop_orders`表增加`data:jsonb`字段，用于存储一些自定义服务参数~~（items里面就可以实现。。。）
