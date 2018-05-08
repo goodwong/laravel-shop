@@ -55,7 +55,9 @@ class Order extends Model
      */
     public function items()
     {
-        return $this->hasMany('Goodwong\Shop\Entities\OrderItem');
+        return $this->hasMany('Goodwong\Shop\Entities\OrderItem')
+        ->orderBy('id', 'asc')
+        ;
     }
 
     /**
