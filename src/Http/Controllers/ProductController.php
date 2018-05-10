@@ -17,7 +17,7 @@ class ProductController extends Controller
     {
         $per_page = $request->input('per_page', 15);
 
-        $query = Product::orderBy('id', 'desc')->orderBy('position', 'asc');
+        $query = Product::orderBy('position', 'asc')->orderBy('id', 'desc');
         if ($shop_id = $request->input('shop')) {
             $query = $query->where('shop_id', $shop_id);
         }
