@@ -13,17 +13,38 @@
 
 
 ## 安装
-1. 添加 子模块
-```shell
-git submodule add https://github.com/goodwong/laravel-shop.git .packages/goodwong/laravel-shop
+
+1. 加入项目（非packagist）
+编辑composer.json
+```json
+    "prefer-stable": true,
+    // ....
+    // 加上以下内容
+    "repositories": [
+        {
+            "type": "path",
+            "url": ".packages/*/*"
+        }
+    ]
 ```
 
-2. 添加composer配置
+2. 添加 子模块
+```shell
+git submodule add https://github.com/goodwong/laravel-shop.git .packages/goodwong/laravel-shop
+# git submodule add git@github.com:goodwong/laravel-shop.git .packages/goodwong/laravel-shop
+```
+
+3. 添加composer配置
 ```json
     "goodwong/laravel-shop": "dev-master",
 ```
+或
+```shell
+composer require goodwong/laravel-shop
+```
 
-3. 创建配置文件（用于配置支付网关）：
+
+4. 创建配置文件（用于配置支付网关）：
 ```shell
 composer update
 php artisan vendor:publish --provider="Goodwong\Shop\ShopServiceProvider"
