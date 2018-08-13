@@ -16,7 +16,8 @@ class CreateOrdersTable extends Migration
         Schema::create('shop_orders', function (Blueprint $table) {
             $table->increments('id');
             $table->string('context', 32)->nullable()->comment('如：shop_15、project_15、recharge');
-            $table->integer('user_id')->unsigned()->comment('用户id');
+            $table->integer('user_id')->unsigned()->nullable()->comment('用户id');
+            $table->integer('agent_id')->unsigned()->nullable()->comment('代理id');
             $table->jsonb('contacts')->nullable()->comment('联系人信息');
             $table->string('comment')->nullable()->comment('用户评论');
             $table->string('status', 16)->default('new')->comment('订单状态');

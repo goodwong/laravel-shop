@@ -153,6 +153,9 @@ $shopping->contacts([
 // 用户（可选，新订单默认当前用户）
 $shopping->user(1);
 
+// 代理
+$shopping->agent(1);
+
 // 留言
 $shopping->orderComment($comment = 'some comments...');
 

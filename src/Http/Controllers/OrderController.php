@@ -54,6 +54,9 @@ class OrderController extends Controller
         if ($request->input('user_id')) {
             $shopping->user($request->input('user_id'));
         }
+        if ($request->input('agent_id')) {
+            $shopping->agent($request->input('agent_id'));
+        }
         if ($request->input('context')) {
             $shopping->order()->context = $request->input('context');
         }
@@ -75,7 +78,8 @@ class OrderController extends Controller
             }
             if (isset($item['specs'])) {
                 $shopping->specs($item['specs']);
-                // specs 如果影响价格，则需要在这里计算 row_total
+                // 如果需要根据specs参数决定价格，
+                // 则需要在这里加上计算逻辑，并手动设置row_total
                 // $shopping->rowTotal($computedRowTotal);
             }
             $shopping->add($item['qty'] ?? null);

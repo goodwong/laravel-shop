@@ -296,6 +296,18 @@ class Shopping
     }
 
     /**
+     * set agent id
+     * 
+     * @param  int  $userId
+     * @return self
+     */
+    public function agent (int $userId)
+    {
+        $this->order()->agent_id = $userId;
+        return $this;
+    }
+
+    /**
      * set contacts
      * 
      * @param  array  $contacts
@@ -360,7 +372,7 @@ class Shopping
     public function save ()
     {
         $isNew = !$this->order()->id;
-        if ($isNew && !isset($this->order()->user_id)) {
+        if ($isNew && !isset($this->order()->user_id) && !isset($this->order()->agent_id)) {
             $this->order()->user_id = request()->user()->id ?? null;
         }
 
